@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDSAT — Digital & Data Sovereignty Assessment Tool</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{--navy:#0f172a;--navy-mid:#1e3a5f;--blue:#2563eb;--sky:#0ea5e9;--green:#10b981;--amber:#f59e0b;--red:#ef4444;--gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;--gray-300:#cbd5e1;--gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;--gray-700:#334155;--gray-800:#1e293b;--gray-900:#0f172a}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--gray-50);color:var(--gray-800);min-height:100vh}
+.header{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 12px rgba(0,0,0,.35);position:sticky;top:0;z-index:200}
+.header-brand{display:flex;align-items:center;gap:12px}
+.header-logo{width:42px;height:42px;background:linear-gradient(135deg,var(--blue),var(--sky));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;letter-spacing:-1px}
+.header-title h1{font-size:17px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.header-title p{font-size:11px;color:rgba(255,255,255,.55);margin-top:2px}
+.header-right{display:flex;align-items:center;gap:10px}
+.header-badge{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:rgba(255,255,255,.85);padding:5px 13px;border-radius:20px;font-size:11px;font-weight:600}
+.view{display:none}.view.active{display:block}
+/* WELCOME */
+.welcome-wrap{min-height:calc(100vh - 70px);display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.welcome-card{background:#fff;border-radius:20px;padding:48px;max-width:740px;width:100%;box-shadow:0 8px 48px rgba(0,0,0,.09)}
+.welcome-hero{text-align:center;margin-bottom:36px}
+.welcome-icon{width:76px;height:76px;background:linear-gradient(135deg,#dbeafe,#e0f2fe);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 18px}
+.welcome-hero h2{font-size:27px;font-weight:900;color:var(--navy);letter-spacing:-.5px;margin-bottom:10px}
+.welcome-hero p{font-size:14px;color:var(--gray-500);line-height:1.65;max-width:500px;margin:0 auto}
+.pillars-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:32px}
+.pillar-chip{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:12px 8px;text-align:center}
+.pillar-chip .icon{font-size:20px;margin-bottom:5px}
+.pillar-chip .label{font-size:10px;font-weight:700;color:var(--gray-600);line-height:1.3;text-transform:uppercase;letter-spacing:.3px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group.full{grid-column:span 2}
+.form-group label{font-size:12px;font-weight:700;color:var(--gray-700);text-transform:uppercase;letter-spacing:.4px}
+.form-group input,.form-group select,.form-group textarea{border:1.5px solid var(--gray-200);border-radius:8px;padding:10px 13px;font-size:14px;color:var(--gray-800);outline:none;transition:border-color .2s;font-family:inherit;background:#fff}
+.form-group input:focus,.form-group select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .18s;text-decoration:none;font-family:inherit}
+.btn-primary{background:linear-gradient(135deg,var(--blue),#1d4ed8);color:#fff}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 22px rgba(37,99,235,.38)}
+.btn-secondary{background:#fff;color:var(--gray-700);border:1.5px solid var(--gray-300)}
+.btn-secondary:hover{background:var(--gray-50);border-color:var(--gray-400)}
+.btn-outline-blue{background:transparent;color:var(--blue);border:1.5px solid var(--blue)}
+.btn-outline-blue:hover{background:#eff6ff}
+.btn-lg{padding:14px 32px;font-size:15px;border-radius:12px}
+.btn-full{width:100%;justify-content:center}
+.btn-green{background:linear-gradient(135deg,var(--green),#059669);color:#fff}
+.btn-green:hover{box-shadow:0 6px 20px rgba(16,185,129,.38)}
+/* ASSESSMENT LAYOUT */
+.assessment-layout{display:flex;min-height:calc(100vh - 70px)}
+.assessment-sidebar{width:270px;background:#fff;border-right:1px solid var(--gray-200);padding:20px 14px;position:sticky;top:70px;height:calc(100vh - 70px);overflow-y:auto;flex-shrink:0}
+.score-widget{background:linear-gradient(135deg,var(--navy),var(--navy-mid));border-radius:12px;padding:16px;margin-bottom:16px;color:#fff}
+.score-widget-label{font-size:10px;font-weight:700;opacity:.65;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.score-widget-value{font-size:38px;font-weight:900;letter-spacing:-2px;line-height:1}
+.score-widget-level{font-size:11px;opacity:.75;margin-top:4px}
+.score-widget-bar{height:4px;background:rgba(255,255,255,.2);border-radius:2px;margin-top:10px}
+.score-widget-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--sky),var(--green));transition:width .5s ease}
+.sidebar-progress-label{font-size:10px;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.sidebar-progress-bar{height:5px;background:var(--gray-200);border-radius:3px;margin-bottom:5px}
+.sidebar-progress-fill{height:100%;background:linear-gradient(90deg,var(--blue),var(--sky));border-radius:3px;transition:width .4s}
+.sidebar-progress-text{font-size:11px;color:var(--gray-400);margin-bottom:16px}
+.sidebar-pillar-header{font-size:10px;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.6px;padding:6px 8px;margin-top:8px}
+.sidebar-domain{padding:7px 8px 7px 20px;font-size:12px;color:var(--gray-500);border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:all .14s;gap:6px}
+.sidebar-domain:hover{background:var(--gray-50);color:var(--gray-700)}
+.sidebar-domain.active{background:#dbeafe;color:var(--blue);font-weight:700}
+.sidebar-domain.completed{color:var(--green)}
+.domain-check{width:16px;height:16px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;flex-shrink:0}
+.sidebar-domain.completed .domain-check{background:var(--green);border-color:var(--green);color:#fff}
+/* ASSESSMENT MAIN */
+.assessment-main{flex:1;padding:28px 32px;overflow-y:auto}
+.domain-header{margin-bottom:24px}
+.domain-breadcrumb{font-size:12px;color:var(--gray-400);margin-bottom:6px}
+.domain-breadcrumb strong{color:var(--blue)}
+.domain-title{font-size:22px;font-weight:900;color:var(--navy);letter-spacing:-.4px;margin-bottom:4px}
+.domain-desc{font-size:13px;color:var(--gray-500);line-height:1.5}
+.question-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:14px;padding:22px;margin-bottom:14px;transition:border-color .18s}
+.question-card:hover{border-color:var(--gray-300)}
+.question-card.answered{border-color:#bfdbfe}
+.question-num{font-size:10px;font-weight:800;color:var(--blue);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.question-text{font-size:14px;font-weight:700;color:var(--gray-800);margin-bottom:14px;line-height:1.55}
+.options-list{display:flex;flex-direction:column;gap:7px}
+.option-item{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border:1.5px solid var(--gray-200);border-radius:10px;cursor:pointer;transition:all .14s}
+.option-item:hover{border-color:#93c5fd;background:#f0f7ff}
+.option-item.selected{border-color:var(--blue);background:#eff6ff}
+.option-radio{width:17px;height:17px;border:2px solid var(--gray-300);border-radius:50%;flex-shrink:0;margin-top:1px;transition:all .14s;position:relative}
+.option-item.selected .option-radio{border-color:var(--blue);background:var(--blue)}
+.option-item.selected .option-radio::after{content:'';width:5px;height:5px;background:#fff;border-radius:50%;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%)}
+.option-text{font-size:13px;color:var(--gray-700);line-height:1.45;flex:1}
+.option-score-badge{margin-left:auto;font-size:10px;font-weight:800;padding:2px 8px;border-radius:20px;flex-shrink:0;align-self:flex-start;margin-top:1px}
+.sb-3{background:#dcfce7;color:#15803d}.sb-2{background:#fef9c3;color:#854d0e}.sb-1{background:#ffedd5;color:#9a3412}.sb-0{background:#fee2e2;color:#991b1b}
+.assessment-nav{display:flex;align-items:center;justify-content:space-between;margin-top:28px;padding-top:22px;border-top:1px solid var(--gray-200)}
+.nav-info{font-size:12px;color:var(--gray-400)}
+/* DASHBOARD */
+.dashboard{padding:28px 32px;max-width:1400px;margin:0 auto}
+.dash-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px;flex-wrap:wrap;gap:14px}
+.dash-header h2{font-size:26px;font-weight:900;color:var(--navy);letter-spacing:-.5px}
+.dash-header p{font-size:13px;color:var(--gray-500);margin-top:5px}
+.dash-actions{display:flex;gap:9px;flex-wrap:wrap}
+.dsi-hero{background:linear-gradient(135deg,var(--navy) 0%,#1e3a5f 50%,#1e40af 100%);border-radius:18px;padding:28px 32px;margin-bottom:24px;display:flex;align-items:center;gap:32px;color:#fff;position:relative;overflow:hidden}
+.dsi-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.dsi-hero::after{content:'';position:absolute;bottom:-60px;right:80px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.03)}
+.dsi-score-ring{position:relative;width:120px;height:120px;flex-shrink:0}
+.dsi-score-ring canvas{position:absolute;top:0;left:0}
+.dsi-score-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.dsi-score-num{font-size:30px;font-weight:900;letter-spacing:-2px;line-height:1}
+.dsi-score-pct{font-size:12px;opacity:.7}
+.dsi-meta h3{font-size:20px;font-weight:900;letter-spacing:-.3px;margin-bottom:6px}
+.dsi-meta p{font-size:13px;opacity:.75;line-height:1.55;max-width:400px;margin-bottom:14px}
+.maturity-badge{display:inline-block;padding:6px 18px;border-radius:30px;font-size:13px;font-weight:800;letter-spacing:.3px}
+.mb-optimizing{background:rgba(16,185,129,.25);color:#6ee7b7}
+.mb-managed{background:rgba(37,99,235,.25);color:#93c5fd}
+.mb-defined{background:rgba(245,158,11,.25);color:#fcd34d}
+.mb-developing{background:rgba(239,68,68,.25);color:#fca5a5}
+.mb-initial{background:rgba(239,68,68,.35);color:#fca5a5}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.kpi-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:14px;padding:18px;position:relative;overflow:hidden}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi-green::before{background:var(--green)}.kpi-blue::before{background:var(--blue)}.kpi-amber::before{background:var(--amber)}.kpi-red::before{background:var(--red)}.kpi-sky::before{background:var(--sky)}
+.kpi-label{font-size:11px;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px}
+.kpi-value{font-size:30px;font-weight:900;letter-spacing:-1.5px;margin-bottom:4px;line-height:1}
+.kv-green{color:var(--green)}.kv-blue{color:var(--blue)}.kv-amber{color:var(--amber)}.kv-red{color:var(--red)}.kv-sky{color:var(--sky)}
+.kpi-sub{font-size:11px;color:var(--gray-400);margin-bottom:10px}
+.kpi-mini-bar{height:3px;background:var(--gray-200);border-radius:2px}
+.kpi-mini-bar-fill{height:100%;border-radius:2px;transition:width .6s}
+.fill-green{background:var(--green)}.fill-blue{background:var(--blue)}.fill-amber{background:var(--amber)}.fill-red{background:var(--red)}.fill-sky{background:var(--sky)}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px}
+.chart-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:14px;padding:22px}
+.chart-card.wide{grid-column:span 2}
+.chart-title{font-size:14px;font-weight:800;color:var(--gray-800);margin-bottom:3px}
+.chart-sub{font-size:11px;color:var(--gray-400);margin-bottom:18px}
+.chart-wrap{position:relative;height:260px}
+.domain-scores-section{background:#fff;border:1.5px solid var(--gray-200);border-radius:14px;margin-bottom:24px;overflow:hidden}
+.section-heading{padding:18px 22px;border-bottom:1px solid var(--gray-100);display:flex;align-items:center;justify-content:space-between}
+.section-heading h3{font-size:14px;font-weight:800;color:var(--gray-800)}
+.section-heading p{font-size:11px;color:var(--gray-400)}
+table.scores-table{width:100%;border-collapse:collapse}
+.scores-table th{text-align:left;font-size:10px;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.5px;padding:10px 20px;background:var(--gray-50);border-bottom:1px solid var(--gray-200)}
+.scores-table td{padding:13px 20px;border-bottom:1px solid var(--gray-100);font-size:13px;vertical-align:middle}
+.scores-table tr:last-child td{border-bottom:none}
+.scores-table tr:hover td{background:var(--gray-50)}
+.score-pill{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:800}
+.sp-excellent{background:#dcfce7;color:#15803d}.sp-good{background:#d1fae5;color:#065f46}.sp-fair{background:#fef9c3;color:#713f12}.sp-poor{background:#ffedd5;color:#9a3412}.sp-critical{background:#fee2e2;color:#991b1b}
+.inline-bar{height:7px;background:var(--gray-200);border-radius:4px;width:100px;overflow:hidden;display:inline-block;vertical-align:middle}
+.inline-bar-fill{height:100%;border-radius:4px}
+.pillar-tag{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.pt-1{background:#ede9fe;color:#6d28d9}.pt-2{background:#dbeafe;color:#1d4ed8}.pt-3{background:#fce7f3;color:#9d174d}.pt-4{background:#d1fae5;color:#065f46}.pt-5{background:#fef9c3;color:#713f12}
+.recs-section{margin-bottom:24px}
+.recs-section h3{font-size:15px;font-weight:800;color:var(--gray-800);margin-bottom:12px}
+.recs-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.rec-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:12px;padding:16px;display:flex;gap:12px;align-items:flex-start}
+.rec-pri{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0}
+.rp-high{background:#fee2e2;color:#991b1b}.rp-medium{background:#fef9c3;color:#713f12}.rp-low{background:#dcfce7;color:#15803d}
+.rec-card h4{font-size:13px;font-weight:800;color:var(--gray-800);margin-bottom:4px}
+.rec-card p{font-size:12px;color:var(--gray-500);line-height:1.5}
+.rec-card .rec-domain{font-size:10px;font-weight:700;color:var(--blue);margin-bottom:4px}
+/* PRINT */
+.report-section{padding:32px;max-width:1000px;margin:0 auto}
+@media print{
+  .header{background:var(--navy)!important;position:relative!important}
+  .no-print{display:none!important}
+  .view.active{display:block!important}
+  body{background:#fff}
+}
+/* scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--gray-300);border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .28s ease}
+@media(max-width:900px){
+  .assessment-sidebar{display:none}
+  .assessment-main{padding:16px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .charts-row{grid-template-columns:1fr}
+  .chart-card.wide{grid-column:span 1}
+  .recs-grid{grid-template-columns:1fr}
+  .pillars-grid{grid-template-columns:repeat(3,1fr)}
+  .form-grid{grid-template-columns:1fr}
+  .form-group.full{grid-column:span 1}
+  .dsi-hero{flex-direction:column;gap:20px}
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="header-brand">
+    <div class="header-logo">DS</div>
+    <div class="header-title">
+      <h1>DDSAT</h1>
+      <p>Digital &amp; Data Sovereignty Assessment Tool</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="header-org" class="header-badge" style="display:none"></span>
+    <span class="header-badge">v2.0</span>
+  </div>
+</header>
+
+<!-- WELCOME VIEW -->
+<div id="view-welcome" class="view active">
+<div class="welcome-wrap">
+<div class="welcome-card fade-in">
+  <div class="welcome-hero">
+    <div class="welcome-icon">🛡️</div>
+    <h2>Digital &amp; Data Sovereignty Assessment</h2>
+    <p>Establish your organisation's baseline across all sovereignty domains — from data residency and AI governance to encryption, vendor audit trails, and executive oversight.</p>
+  </div>
+  <div class="pillars-grid">
+    <div class="pillar-chip"><div class="icon">⚖️</div><div class="label">Legal &amp; Regulatory</div></div>
+    <div class="pillar-chip"><div class="icon">🗄️</div><div class="label">Data &amp; Infrastructure</div></div>
+    <div class="pillar-chip"><div class="icon">🏗️</div><div class="label">Critical Infrastructure</div></div>
+    <div class="pillar-chip"><div class="icon">🌐</div><div class="label">Cross-Border Governance</div></div>
+    <div class="pillar-chip"><div class="icon">🏛️</div><div class="label">Institutional Capacity</div></div>
+  </div>
+  <div class="form-grid">
+    <div class="form-group">
+      <label>Organisation Name *</label>
+      <input type="text" id="org-name" placeholder="Ministry of Digital Affairs" />
+    </div>
+    <div class="form-group">
+      <label>Organisation Type *</label>
+      <select id="org-type">
+        <option value="">Select type…</option>
+        <option>Central Government</option>
+        <option>Regulatory Authority</option>
+        <option>Defence / Intelligence</option>
+        <option>Critical Infrastructure Operator</option>
+        <option>State-Owned Enterprise</option>
+        <option>Financial Services</option>
+        <option>Healthcare</option>
+        <option>Energy &amp; Utilities</option>
+        <option>Telecommunications</option>
+        <option>Other Public Sector</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Country / Jurisdiction *</label>
+      <input type="text" id="org-country" placeholder="e.g. United Kingdom" />
+    </div>
+    <div class="form-group">
+      <label>Assessment Lead</label>
+      <input type="text" id="assessor-name" placeholder="Name &amp; Title" />
+    </div>
+    <div class="form-group full">
+      <label>Assessment Scope / Notes</label>
+      <input type="text" id="assessment-scope" placeholder="e.g. Whole-of-government digital infrastructure, excluding classified systems" />
+    </div>
+  </div>
+  <button class="btn btn-primary btn-lg btn-full" onclick="startAssessment()">
+    <span>Begin Assessment</span>
+    <span>→</span>
+  </button>
+  <p style="text-align:center;font-size:12px;color:var(--gray-400);margin-top:14px">~25–35 minutes · 84 questions across 14 domains · Generates full KPI report</p>
+</div>
+</div>
+</div>
+
+<!-- ASSESSMENT VIEW -->
+<div id="view-assessment" class="view">
+<div class="assessment-layout">
+  <aside class="assessment-sidebar" id="sidebar"></aside>
+  <main class="assessment-main" id="assessment-main"></main>
+</div>
+</div>
+
+<!-- DASHBOARD VIEW -->
+<div id="view-dashboard" class="view">
+<div class="dashboard" id="dashboard-content"></div>
+</div>
+
+<script>
+// ============================================================
+// ASSESSMENT DATA
+// ============================================================
+const PILLARS = [
+  { id:'P1', label:'Legal & Regulatory Alignment', color:'#7c3aed', tag:'pt-1' },
+  { id:'P2', label:'Data Localization & Infrastructure', color:'#2563eb', tag:'pt-2' },
+  { id:'P3', label:'Critical Infrastructure Protection', color:'#db2777', tag:'pt-3' },
+  { id:'P4', label:'Cross-Border Data Flow Governance', color:'#059669', tag:'pt-4' },
+  { id:'P5', label:'Institutional Capacity & Oversight', color:'#d97706', tag:'pt-5' }
+];
+
+const DOMAINS = [
+  { id:'legal',       pillar:'P1', label:'Legal & Regulatory Framework',       desc:'National data protection legislation, AI law, regulatory authority status.',       icon:'⚖️' },
+  { id:'dataprotect', pillar:'P1', label:'Data Protection Compliance',          desc:'DPO designation, DPIAs, breach notification, consent management.',                icon:'🔐' },
+  { id:'residency',   pillar:'P2', label:'Data Residency & Storage',            desc:'Data inventory, geographic storage controls, classification for sovereignty.',   icon:'🗄️' },
+  { id:'infra',       pillar:'P2', label:'Infrastructure Control',              desc:'Ownership, visibility, and independence of critical IT infrastructure.',          icon:'🖥️' },
+  { id:'cloud',       pillar:'P2', label:'Cloud & Infrastructure Sovereignty',  desc:'Sovereign cloud strategy, vendor lock-in prevention, exit planning.',            icon:'☁️' },
+  { id:'encrypt',     pillar:'P2', label:'Encryption & Key Sovereignty',        desc:'Key ownership, HSMs, cryptographic standards, key lifecycle management.',        icon:'🔑' },
+  { id:'critinfra',   pillar:'P3', label:'Critical Infrastructure Protection',  desc:'CNI identification, CIP programme, CSIRT/SOC, incident response.',              icon:'🏗️' },
+  { id:'vendor',      pillar:'P3', label:'Vendor & Supply Chain Management',    desc:'Vendor risk, sovereignty clauses, prohibited vendor lists, concentration risk.',  icon:'🔗' },
+  { id:'crossborder', pillar:'P4', label:'Cross-Border Data Flow Governance',   desc:'Transfer policies, TIAs, SCCs, registers of international data flows.',          icon:'🌐' },
+  { id:'vendoraudit', pillar:'P4', label:'Vendor Access Audit',                 desc:'Vendor access logging, recertification, privileged access controls, audit trails.',icon:'🔍' },
+  { id:'iam',         pillar:'P5', label:'Identity & Access Management',        desc:'IAM framework, MFA, PAM, zero-trust, national PKI.',                             icon:'🪪' },
+  { id:'aiGov',       pillar:'P5', label:'AI Governance & Sovereignty',         desc:'AI inventory, governance framework, training data provenance, AI risk.',          icon:'🤖' },
+  { id:'ops',         pillar:'P5', label:'Operational Sovereignty',             desc:'Operational resilience, skills strategy, vendor-independent procedures, BCP.',    icon:'⚙️' },
+  { id:'institutional',pillar:'P5',label:'Institutional Capacity & Oversight',  desc:'Executive accountability, board-level role, budget, strategy, KPI frameworks.',  icon:'🏛️' }
+];
+
+// Options: each array = [text, score 0-3]
+// Score guide: 3=Optimizing/Full, 2=Managed/Mostly, 1=Developing/Partial, 0=Initial/None
+const QUESTIONS = {
+legal:[
+  {text:"Does your organisation operate under a comprehensive national data protection law?",
+   opts:[["Yes — fully enacted and actively enforced",3],["Enacted but with limited enforcement capacity",2],["Draft legislation or under development",1],["No data protection legislation exists",0]]},
+  {text:"Is there a designated, independent Data Protection Authority (DPA) with enforcement powers?",
+   opts:[["Yes — fully operational DPA with real enforcement capability",3],["DPA established but with limited capacity or independence",2],["DPA in establishment phase",1],["No DPA or equivalent body",0]]},
+  {text:"Does your organisation have a documented legal basis for ALL data processing activities?",
+   opts:[["Yes — fully documented and regularly reviewed",3],["Mostly documented with some gaps",2],["Documentation in progress",1],["No legal basis documentation",0]]},
+  {text:"Are there specific legally mandated data localisation requirements in your jurisdiction?",
+   opts:[["Yes — statutory requirements covering all critical data categories",3],["Yes — statutory requirements for some categories",2],["Voluntary guidelines or policy recommendations only",1],["No data localisation requirements",0]]},
+  {text:"Does your organisation conduct regular legal compliance assessments against data sovereignty laws?",
+   opts:[["Quarterly or more frequent formal assessments",3],["Annual formal assessments",2],["Ad hoc / reactive assessments only",1],["No formal compliance assessments",0]]},
+  {text:"Is there a comprehensive legal framework governing AI system deployment in your jurisdiction?",
+   opts:[["Comprehensive AI law enacted and enforced",3],["Sector-specific AI guidelines or regulations",2],["High-level principles only, no binding rules",1],["No AI governance legislation or framework",0]]},
+],
+dataprotect:[
+  {text:"Does your organisation have a documented, enforced, and current data protection policy?",
+   opts:[["Yes — comprehensive, current, and actively enforced",3],["Yes — policy exists but is outdated",2],["Draft policy under development",1],["No data protection policy",0]]},
+  {text:"Is a Data Protection Officer (DPO) or equivalent formally designated with adequate resources?",
+   opts:[["Yes — full mandate, resources, direct board access",3],["Yes — designated but with limited authority or resources",2],["Role exists in name but lacks mandate",1],["No DPO or equivalent",0]]},
+  {text:"Are Data Protection Impact Assessments (DPIAs) conducted systematically for high-risk processing?",
+   opts:[["Yes — systematically for all high-risk activities, records kept",3],["For most high-risk activities",2],["Occasionally or only when required",1],["DPIAs never conducted",0]]},
+  {text:"Is privacy-by-design embedded in your system development and procurement processes?",
+   opts:[["Fully embedded in all processes and procurement",3],["Applied to most new developments",2],["Occasionally applied, no formal requirement",1],["Not implemented",0]]},
+  {text:"Does your organisation have a tested breach notification procedure meeting regulatory timescales?",
+   opts:[["Yes — tested, operational, within regulatory timescales",3],["Documented but not recently tested",2],["In development",1],["No breach notification procedure",0]]},
+  {text:"Are consent management mechanisms in place and audited for personal data collection?",
+   opts:[["Comprehensive, audited regularly",3],["Basic mechanisms in place",2],["Partial implementation",1],["Not implemented",0]]},
+],
+residency:[
+  {text:"Does your organisation maintain a complete, current inventory of where all sensitive data is stored?",
+   opts:[["Complete inventory, updated at least quarterly",3],["Partial inventory covering most systems",2],["High-level inventory only",1],["No data inventory",0]]},
+  {text:"What percentage of critical/sensitive government data is stored within national boundaries?",
+   opts:[[">95% stored within national jurisdiction",3],["75–95% stored within national jurisdiction",2],["50–74% stored within national jurisdiction",1],["<50% stored within national jurisdiction",0]]},
+  {text:"Are both technical and contractual controls in place to enforce data residency requirements?",
+   opts:[["Both technical and contractual controls enforced",3],["Contractual controls only (no technical enforcement)",2],["Technical controls only (no contractual basis)",1],["Neither technical nor contractual controls",0]]},
+  {text:"Does your organisation have a formal, enforced data classification scheme linked to sovereignty requirements?",
+   opts:[["Yes — comprehensive, enforced classification scheme",3],["Classification exists but inconsistently applied",2],["Basic classification (e.g., Public/Internal only)",1],["No data classification",0]]},
+  {text:"Are data residency requirements mandated in ALL relevant vendor contracts?",
+   opts:[["Yes — all relevant contracts include residency clauses",3],["Most contracts include residency clauses",2],["Some contracts only",1],["No residency clauses in contracts",0]]},
+  {text:"Is vendor compliance with data residency commitments independently verified?",
+   opts:[["Regular independent audits with documented findings",3],["Annual vendor self-assessments reviewed",2],["Occasional ad hoc reviews",1],["No verification process",0]]},
+  {text:"Do backup and disaster recovery systems comply with the same data sovereignty requirements as primary systems?",
+   opts:[["Yes — fully verified and documented",3],["Mostly — with minor gaps",2],["Partial compliance",1],["DR/backup systems not subject to sovereignty controls",0]]},
+],
+infra:[
+  {text:"What proportion of critical IT infrastructure is owned/operated by national entities?",
+   opts:[["Greater than 80%",3],["60–80%",2],["40–59%",1],["Less than 40%",0]]},
+  {text:"Is there a documented, approved national infrastructure sovereignty strategy?",
+   opts:[["Yes — current, approved at senior level, under active implementation",3],["Yes — strategy exists but is outdated",2],["Draft strategy in development",1],["No infrastructure sovereignty strategy",0]]},
+  {text:"Do you have full visibility and control over the technology stack underpinning critical systems?",
+   opts:[["Full visibility and operational control",3],["Mostly visible with partial control",2],["Limited visibility, reactive control",1],["No systematic visibility",0]]},
+  {text:"Are hardware procurement policies in place to address supply chain security and foreign component risk?",
+   opts:[["Comprehensive policies with enforcement and audit",3],["Basic policies with some enforcement",2],["Guidelines exist but no enforcement",1],["No supply chain security policies",0]]},
+  {text:"Can your organisation independently operate critical systems if foreign vendor support is unavailable?",
+   opts:[["Yes — fully self-sufficient for all critical systems",3],["Yes — for most critical systems",2],["Limited capability; significant gaps",1],["Critically dependent on foreign vendors",0]]},
+  {text:"Are independent (nationally-approved) security audits conducted on critical infrastructure?",
+   opts:[["Regular audits by nationally-approved auditors",3],["Occasional audits by approved auditors",2],["Vendor-provided audits only",1],["No security audits",0]]},
+],
+cloud:[
+  {text:"Is there an approved sovereign cloud strategy that explicitly addresses sovereignty requirements?",
+   opts:[["Yes — comprehensive sovereign cloud policy, implemented",3],["Cloud strategy exists but with limited sovereignty provisions",2],["Ad hoc cloud governance",1],["No cloud strategy",0]]},
+  {text:"Does your organisation use sovereign cloud solutions for critical workloads?",
+   opts:[["Yes — sovereign cloud for all critical workloads",3],["Yes — for most critical workloads",2],["Partial use of sovereign cloud",1],["No sovereign cloud capability",0]]},
+  {text:"Are cloud contracts reviewed for sovereignty provisions (data location, access controls, audit rights)?",
+   opts:[["All contracts reviewed with legal and security oversight",3],["Most contracts reviewed",2],["Some contracts reviewed",1],["No sovereignty review of cloud contracts",0]]},
+  {text:"Is there a documented, tested multi-cloud or exit strategy to prevent vendor lock-in?",
+   opts:[["Yes — documented and tested",3],["Documented but not tested",2],["In development",1],["No exit strategy",0]]},
+  {text:"Do cloud providers submit to national jurisdiction through legally established channels?",
+   opts:[["Verified through contract terms and practical precedent",3],["Contractually committed to national jurisdiction",2],["Unclear or contested",1],["No, or unknown",0]]},
+  {text:"Is monitoring and logging data from cloud services retained within national jurisdiction?",
+   opts:[["All logs retained nationally",3],["Most logs retained nationally",2],["Some logs retained nationally",1],["Logs not retained nationally / not monitored",0]]},
+],
+encrypt:[
+  {text:"Does your organisation maintain sole control of encryption keys for all sensitive data?",
+   opts:[["Yes — full key sovereignty for all sensitive data",3],["Key sovereignty for most critical data",2],["Key sovereignty for some data categories",1],["Limited or no encryption key sovereignty",0]]},
+  {text:"Is there a formal, regularly reviewed key management policy?",
+   opts:[["Comprehensive policy, reviewed annually or more",3],["Policy exists but not regularly reviewed",2],["Basic informal guidelines",1],["No key management policy",0]]},
+  {text:"Are all encryption keys stored and managed within national jurisdiction under national control?",
+   opts:[["Yes — fully within national jurisdiction",3],["Mostly — minor exceptions documented",2],["Partially",1],["No — keys held by foreign entities",0]]},
+  {text:"Are nationally or internationally approved cryptographic standards applied consistently?",
+   opts:[["Approved standards consistently applied across all systems",3],["Mostly compliant with documented exceptions",2],["Ad hoc application, no formal standard",1],["No cryptographic standards defined",0]]},
+  {text:"Is there a documented, tested process for key rotation, revocation, and emergency recovery?",
+   opts:[["Fully documented and regularly tested",3],["Documented but not tested",2],["Basic process exists",1],["No key lifecycle process",0]]},
+  {text:"Are Hardware Security Modules (HSMs) or equivalent used for critical key management?",
+   opts:[["Nationally-controlled HSMs in production",3],["Third-party certified HSMs in use",2],["Software-based key management",1],["No dedicated key management solution",0]]},
+],
+critinfra:[
+  {text:"Has your organisation formally identified and maintained a register of all Critical National Infrastructure (CNI) assets?",
+   opts:[["Comprehensive CNI register, regularly updated and classified",3],["CNI register exists but is incomplete",2],["High-level identification only",1],["No formal CNI identification",0]]},
+  {text:"Is there a dedicated, resourced Critical Infrastructure Protection (CIP) programme?",
+   opts:[["Mature CIP programme with regular exercises and governance",3],["CIP programme in place but under-resourced",2],["Ad hoc CIP activities only",1],["No CIP programme",0]]},
+  {text:"Are cyber-physical dependencies within critical infrastructure fully mapped and monitored?",
+   opts:[["Fully mapped and continuously monitored",3],["Mostly mapped with periodic monitoring",2],["Partially mapped",1],["Not systematically mapped",0]]},
+  {text:"Does your organisation operate a 24/7 CSIRT or SOC with a critical infrastructure mandate?",
+   opts:[["Yes — 24/7, operational, with CNI-specific capabilities",3],["Yes — operational but limited CNI focus",2],["Partial capability / business hours only",1],["No CSIRT or SOC",0]]},
+  {text:"Are tested incident response and recovery plans in place for critical infrastructure disruptions?",
+   opts:[["Fully tested plans with annual exercises",3],["Plans documented but rarely exercised",2],["Plans in development",1],["No CNI incident response plans",0]]},
+  {text:"Is foreign investment in critical infrastructure subject to a mandatory sovereignty review?",
+   opts:[["Mandatory review with enforcement and reporting",3],["Review process exists with some enforcement",2],["Voluntary guidance only",1],["No review of foreign investment in CNI",0]]},
+],
+vendor:[
+  {text:"Is there a formal vendor risk assessment process that specifically addresses sovereignty requirements?",
+   opts:[["Comprehensive process with regular reviews and documented outcomes",3],["Process exists with periodic reviews",2],["Basic due diligence, no sovereignty focus",1],["No formal vendor risk assessment",0]]},
+  {text:"Do ALL critical vendor contracts include sovereignty clauses?",
+   opts:[["All critical vendor contracts include sovereignty clauses",3],["Most contracts include sovereignty clauses",2],["Some contracts only",1],["No sovereignty clauses in vendor contracts",0]]},
+  {text:"Is there a formally maintained prohibited or restricted vendor list based on national security grounds?",
+   opts:[["Yes — formally established and actively enforced",3],["Yes — list exists with guidance",2],["Under development",1],["No restricted vendor list",0]]},
+  {text:"Are processes in place to identify and manage concentration risk from single-vendor dependencies?",
+   opts:[["Systematic monitoring with documented mitigation plans",3],["Periodic assessments with some mitigation",2],["Awareness but no formal process",1],["No process",0]]},
+  {text:"Is supply chain security verification conducted for critical technology components?",
+   opts:[["Rigorous verification (BOM, SBOM, hardware) for all critical components",3],["Verification for identified high-risk components",2],["Ad hoc verification",1],["No supply chain verification",0]]},
+  {text:"Are managed service providers subject to enhanced sovereignty requirements and independent audits?",
+   opts:[["Comprehensive enhanced requirements with regular independent audits",3],["Enhanced requirements with periodic audits",2],["Basic requirements, no regular audit",1],["No specific requirements for MSPs",0]]},
+],
+crossborder:[
+  {text:"Is there an enforced policy governing all transfers of data across national borders?",
+   opts:[["Comprehensive policy, consistently enforced with sanctions",3],["Policy exists with inconsistent enforcement",2],["Guidelines only, no enforcement mechanism",1],["No cross-border transfer policy",0]]},
+  {text:"Are Transfer Impact Assessments (TIAs) conducted before any data is transferred internationally?",
+   opts:[["Yes — for all international transfers, documented",3],["For identified high-risk transfers",2],["Occasionally, on request",1],["Never",0]]},
+  {text:"Are appropriate transfer mechanisms (SCCs, BCRs, adequacy decisions) in place for all international data flows?",
+   opts:[["All international transfers are covered by approved mechanisms",3],["Most transfers covered",2],["Some transfers covered",1],["No transfer mechanisms in place",0]]},
+  {text:"Does your organisation maintain a complete, current register of all international data transfers?",
+   opts:[["Complete and current register, regularly audited",3],["Partial register with most significant flows",2],["Register under development",1],["No register of international transfers",0]]},
+  {text:"Are technical controls in place to prevent unauthorised or inadvertent cross-border data flows?",
+   opts:[["Technical and process controls, regularly tested",3],["Process controls only, no technical enforcement",2],["Awareness but limited controls",1],["No controls",0]]},
+  {text:"Is your organisation actively engaged in international data governance frameworks and treaties?",
+   opts:[["Active participant with leadership roles in multiple frameworks",3],["Participant in some international frameworks",2],["Observer / limited engagement",1],["No international governance engagement",0]]},
+],
+vendoraudit:[
+  {text:"Is ALL vendor access to sensitive systems and data logged and actively monitored?",
+   opts:[["All access logged and actively monitored with alerts",3],["Most access logged, periodic monitoring",2],["Some logging, minimal monitoring",1],["No systematic vendor access logging",0]]},
+  {text:"Are vendor access rights formally reviewed and recertified on a regular schedule?",
+   opts:[["Formal quarterly review cycle with documented sign-off",3],["Annual review",2],["Ad hoc reviews only",1],["No vendor access review process",0]]},
+  {text:"Is privileged vendor access restricted through just-in-time or time-limited mechanisms?",
+   opts:[["Yes — all privileged access via JIT/time-limited controls",3],["Most privileged access controlled",2],["Some controls in place",1],["No privileged access controls for vendors",0]]},
+  {text:"Are vendors contractually prohibited from accessing data outside agreed jurisdictional parameters?",
+   opts:[["Yes — with technical enforcement and contractual terms",3],["Yes — contractually only",2],["Guidelines/recommendations only",1],["No jurisdictional access restrictions",0]]},
+  {text:"Do vendor support sessions require national supervision or co-presence?",
+   opts:[["Mandatory supervised access for all critical systems",3],["Required for critical systems",2],["Encouraged but not required",1],["No supervision requirement",0]]},
+  {text:"Is there an immutable audit trail for all vendor activities, protected from vendor tampering?",
+   opts:[["Immutable audit trail, retained per policy, tested",3],["Audit trail exists but not tamper-proof",2],["Basic logging, no integrity protection",1],["No vendor activity audit trail",0]]},
+],
+iam:[
+  {text:"Is there a mature, enterprise-wide Identity and Access Management (IAM) framework in place?",
+   opts:[["Mature framework consistently applied organisation-wide",3],["Framework in place with some gaps",2],["Basic framework, significant gaps",1],["No IAM framework",0]]},
+  {text:"Is multi-factor authentication (MFA) enforced for access to ALL sensitive and critical systems?",
+   opts:[["Enforced for all users on all sensitive systems",3],["Enforced for privileged accounts and most systems",2],["Recommended but not universally enforced",1],["Not implemented",0]]},
+  {text:"Is a Privileged Access Management (PAM) solution deployed for managing privileged accounts?",
+   opts:[["Comprehensive PAM solution fully deployed",3],["Partial PAM deployment",2],["Basic privileged account controls",1],["No PAM",0]]},
+  {text:"Is there an automated onboarding/offboarding process with timely deprovisioning controls?",
+   opts:[["Automated process with monitoring and SLA enforcement",3],["Documented process executed manually",2],["Ad hoc process",1],["No formal provisioning/deprovisioning process",0]]},
+  {text:"Are zero-trust security principles applied to your access management architecture?",
+   opts:[["Fully implemented zero-trust architecture",3],["Significant zero-trust elements deployed",2],["Zero-trust in planning / early stages",1],["No zero-trust approach",0]]},
+  {text:"Is a national identity infrastructure (PKI, digital ID) used for government authentication?",
+   opts:[["Comprehensive national PKI / digital ID fully implemented",3],["Partially implemented",2],["In development",1],["Not implemented",0]]},
+  {text:"Are access rights regularly reviewed against least-privilege principles?",
+   opts:[["Formal quarterly reviews with documented outcomes",3],["Annual reviews",2],["Ad hoc reviews",1],["No access reviews",0]]},
+],
+aiGov:[
+  {text:"Does your organisation maintain a complete inventory of all AI systems in use?",
+   opts:[["Complete inventory with risk classification, updated regularly",3],["Partial inventory covering most significant systems",2],["High-level overview only",1],["No AI system inventory",0]]},
+  {text:"Is there a formal AI governance framework covering procurement, deployment, and ongoing oversight?",
+   opts:[["Comprehensive AI governance framework, enforced",3],["Policy exists with limited coverage",2],["Basic informal guidelines",1],["No AI governance policy",0]]},
+  {text:"Are training datasets for critical AI systems sourced and stored within national jurisdiction?",
+   opts:[["Yes — all critical AI systems, verified",3],["Yes — for most critical AI systems",2],["For some AI systems",1],["Not assessed or not controlled",0]]},
+  {text:"Is there a formal process to assess and manage AI sovereignty risks (vendor dependency, bias, explainability)?",
+   opts:[["Formal AI risk assessment process with documented outcomes",3],["Periodic risk assessments",2],["Ad hoc assessments only",1],["No AI sovereignty risk process",0]]},
+  {text:"Are AI decisions in critical public services subject to mandatory human oversight and explainability requirements?",
+   opts:[["Mandatory with enforcement mechanisms and audit capability",3],["Required but limited enforcement",2],["Guidelines / recommendations only",1],["No requirements",0]]},
+  {text:"Does your national or organisational AI strategy explicitly address sovereignty and security?",
+   opts:[["Comprehensive AI strategy with dedicated sovereignty provisions",3],["AI strategy with limited sovereignty provisions",2],["AI strategy in development",1],["No national or organisational AI strategy",0]]},
+  {text:"Are there technical controls preventing sensitive data exfiltration through AI model training or inference?",
+   opts:[["Technical controls AND contractual safeguards in place",3],["Contractual safeguards only",2],["Awareness but no formal controls",1],["No controls",0]]},
+],
+ops:[
+  {text:"Can your organisation maintain critical services without external dependencies during a sustained crisis?",
+   opts:[["Full operational resilience demonstrated through regular exercises",3],["Capability exists but not regularly exercised",2],["Limited resilience; significant gaps",1],["High dependency on external parties",0]]},
+  {text:"Is there a national or organisational digital skills strategy covering sovereignty-critical competencies?",
+   opts:[["Comprehensive strategy with measurable implementation",3],["Strategy exists with partial implementation",2],["Strategy in development",1],["No digital skills strategy",0]]},
+  {text:"Are documented operational procedures in place that do NOT rely on foreign vendor intervention?",
+   opts:[["Yes — for all critical operations, tested",3],["Yes — for most critical operations",2],["For some operations only",1],["Operations heavily dependent on foreign vendor procedures",0]]},
+  {text:"Does your Business Continuity Plan explicitly account for loss of access to foreign technology or services?",
+   opts:[["Comprehensive BCP with sovereignty scenarios, regularly tested",3],["BCP exists but without explicit sovereignty scenarios",2],["Basic BCP",1],["No BCP",0]]},
+  {text:"Does your organisation possess national cyber defence capabilities (defensive, intelligence, response)?",
+   opts:[["Mature, multi-dimensional cyber defence capability",3],["Significant capabilities with some gaps",2],["Basic capabilities",1],["Nascent or no cyber defence capability",0]]},
+  {text:"Is there a sustained programme to develop and retain nationally-based sovereign technology expertise?",
+   opts:[["Comprehensive programme with measurable retention outcomes",3],["Programme exists with partial results",2],["In planning phase",1],["No programme",0]]},
+],
+institutional:[
+  {text:"Is there a designated executive role (C-level or equivalent) with formal digital sovereignty responsibility and board accountability?",
+   opts:[["Yes — full mandate, dedicated resources, board accountability",3],["Yes — designated but with limited mandate or resources",2],["Role exists in name only",1],["No designated sovereignty leadership role",0]]},
+  {text:"Does executive leadership receive structured, regular briefings on digital sovereignty risks and posture?",
+   opts:[["Regular structured briefings at least quarterly",3],["Annual briefings",2],["Ad hoc briefings only",1],["No executive briefings on sovereignty",0]]},
+  {text:"Is there a dedicated, protected budget allocation for digital sovereignty initiatives?",
+   opts:[["Ring-fenced, multi-year sovereignty budget",3],["Budget within broader IT/security allocation",2],["Ad hoc or project-based funding only",1],["No dedicated sovereignty budget",0]]},
+  {text:"Is there an approved, current organisational digital sovereignty strategy?",
+   opts:[["Comprehensive strategy approved at board/ministerial level, regularly updated",3],["Strategy approved but rarely reviewed",2],["Draft strategy under development",1],["No digital sovereignty strategy",0]]},
+  {text:"Are accountability frameworks and quantifiable KPIs defined for digital sovereignty outcomes?",
+   opts:[["Formal accountability with measured, reported KPIs",3],["Some accountability measures, limited KPIs",2],["Informal accountability only",1],["No accountability framework",0]]},
+  {text:"Does your organisation actively participate in national and international sovereignty governance bodies?",
+   opts:[["Active participant with leadership or steering roles",3],["Regular participant",2],["Observer / limited engagement",1],["No participation",0]]},
+  {text:"Is there a formal process to identify, assess, and escalate emerging digital sovereignty threats to executive level?",
+   opts:[["Formal escalation process, tested and embedded",3],["Escalation process documented but not tested",2],["Ad hoc escalation",1],["No escalation process",0]]},
+]
+};
+
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  org: {},
+  answers: {},   // { 'legal-0': 2, 'dataprotect-1': 1, ... }
+  currentDomain: 'legal',
+  view: 'welcome',
+  charts: {}
+};
+
+function getDomainIndex(id){ return DOMAINS.findIndex(d=>d.id===id); }
+function getNextDomain(id){
+  const i = getDomainIndex(id);
+  return i < DOMAINS.length-1 ? DOMAINS[i+1].id : null;
+}
+function getPrevDomain(id){
+  const i = getDomainIndex(id);
+  return i > 0 ? DOMAINS[i-1].id : null;
+}
+
+function domainAnswered(id){
+  const qs = QUESTIONS[id];
+  return qs.every((_,i) => state.answers[id+'-'+i] !== undefined);
+}
+
+function domainScore(id){
+  const qs = QUESTIONS[id];
+  let total=0, max=0;
+  qs.forEach((q,i)=>{
+    max+=3;
+    if(state.answers[id+'-'+i]!==undefined) total+=state.answers[id+'-'+i];
+  });
+  return max>0 ? Math.round(total/max*100) : 0;
+}
+
+function pillarScore(pid){
+  const doms = DOMAINS.filter(d=>d.pillar===pid);
+  if(!doms.length) return 0;
+  const scores = doms.map(d=>domainScore(d.id));
+  return Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+}
+
+function overallScore(){
+  const weights = {P1:0.20, P2:0.25, P3:0.20, P4:0.15, P5:0.20};
+  return Math.round(PILLARS.reduce((acc,p)=>acc+pillarScore(p.id)*weights[p.id],0));
+}
+
+function maturityLevel(score){
+  if(score>=80) return {label:'Optimizing',cls:'mb-optimizing',color:'#10b981'};
+  if(score>=60) return {label:'Managed',cls:'mb-managed',color:'#2563eb'};
+  if(score>=40) return {label:'Defined',cls:'mb-defined',color:'#d97706'};
+  if(score>=20) return {label:'Developing',cls:'mb-developing',color:'#ef4444'};
+  return {label:'Initial / Ad-hoc',cls:'mb-initial',color:'#ef4444'};
+}
+
+function scoreColor(s){ if(s>=80)return'green';if(s>=60)return'blue';if(s>=40)return'amber';return'red'; }
+function scorePillClass(s){ if(s>=80)return'sp-excellent';if(s>=60)return'sp-good';if(s>=40)return'sp-fair';if(s>=20)return'sp-poor';return'sp-critical'; }
+function scoreColorHex(s){ if(s>=80)return'#10b981';if(s>=60)return'#2563eb';if(s>=40)return'#f59e0b';return'#ef4444'; }
+
+function answeredCount(){
+  return Object.keys(state.answers).length;
+}
+function totalQuestions(){
+  return Object.values(QUESTIONS).reduce((a,q)=>a+q.length,0);
+}
+
+// ============================================================
+// VIEW MANAGEMENT
+// ============================================================
+function showView(v){
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  state.view=v;
+}
+
+// ============================================================
+// WELCOME
+// ============================================================
+function startAssessment(){
+  const name=document.getElementById('org-name').value.trim();
+  const type=document.getElementById('org-type').value;
+  const country=document.getElementById('org-country').value.trim();
+  if(!name||!type||!country){
+    alert('Please complete the required fields: Organisation Name, Type, and Country.');
+    return;
+  }
+  state.org={name,type,country,assessor:document.getElementById('assessor-name').value.trim(),scope:document.getElementById('assessment-scope').value.trim(),date:new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})};
+  document.getElementById('header-org').textContent=name;
+  document.getElementById('header-org').style.display='';
+  state.currentDomain='legal';
+  showView('assessment');
+  renderAssessment();
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+function renderSidebar(){
+  const answered=answeredCount(), total=totalQuestions();
+  const pct=Math.round(answered/total*100);
+  const score=overallScore();
+  const ml=maturityLevel(score);
+
+  let html=`<div class="score-widget">
+    <div class="score-widget-label">Live DSI Score</div>
+    <div class="score-widget-value">${score}</div>
+    <div class="score-widget-level">${ml.label}</div>
+    <div class="score-widget-bar"><div class="score-widget-bar-fill" style="width:${score}%"></div></div>
+  </div>
+  <div class="sidebar-progress-label">Progress</div>
+  <div class="sidebar-progress-bar"><div class="sidebar-progress-fill" style="width:${pct}%"></div></div>
+  <div class="sidebar-progress-text">${answered} / ${total} questions answered</div>`;
+
+  PILLARS.forEach(p=>{
+    const doms=DOMAINS.filter(d=>d.pillar===p.id);
+    html+=`<div class="sidebar-pillar-header">${p.label}</div>`;
+    doms.forEach(d=>{
+      const completed=domainAnswered(d.id);
+      const active=d.id===state.currentDomain;
+      html+=`<div class="sidebar-domain ${active?'active':''} ${completed&&!active?'completed':''}" onclick="goToDomain('${d.id}')">
+        <span>${d.icon} ${d.label}</span>
+        <span class="domain-check">${completed?'✓':''}</span>
+      </div>`;
+    });
+  });
+  document.getElementById('sidebar').innerHTML=html;
+}
+
+// ============================================================
+// ASSESSMENT MAIN
+// ============================================================
+function renderAssessment(){
+  renderSidebar();
+  const domain=DOMAINS.find(d=>d.id===state.currentDomain);
+  const pillar=PILLARS.find(p=>p.id===domain.pillar);
+  const questions=QUESTIONS[domain.id];
+  const domIdx=getDomainIndex(domain.id)+1;
+  const prev=getPrevDomain(domain.id);
+  const next=getNextDomain(domain.id);
+  const allAnswered=domainAnswered(domain.id);
+
+  let qhtml=questions.map((q,i)=>{
+    const key=domain.id+'-'+i;
+    const sel=state.answers[key];
+    const optsHtml=q.opts.map(([text,score],oi)=>{
+      const isSelected=sel===score&&sel!==undefined? true: false;
+      // Actually track by option index to handle duplicate scores
+      const isSelIdx=state.answerIdx&&state.answerIdx[key]===oi;
+      const scls=['sb-0','sb-1','sb-2','sb-3'][score];
+      return `<div class="option-item ${isSelIdx?'selected':''}" onclick="selectOption('${key}',${score},${oi})">
+        <div class="option-radio"></div>
+        <div class="option-text">${text}</div>
+        <span class="option-score-badge ${scls}">${['Critical','Developing','Managed','Optimizing'][score]}</span>
+      </div>`;
+    }).join('');
+    return `<div class="question-card ${sel!==undefined?'answered':''}" id="qcard-${key}">
+      <div class="question-num">Question ${i+1} of ${questions.length}</div>
+      <div class="question-text">${q.text}</div>
+      <div class="options-list">${optsHtml}</div>
+    </div>`;
+  }).join('');
+
+  const dScore=domainScore(domain.id);
+
+  document.getElementById('assessment-main').innerHTML=`
+  <div class="domain-header fade-in">
+    <div class="domain-breadcrumb">Pillar ${PILLARS.indexOf(pillar)+1}: <strong>${pillar.label}</strong> &rsaquo; Domain ${domIdx} of ${DOMAINS.length}</div>
+    <div class="domain-title">${domain.icon} ${domain.label}</div>
+    <div class="domain-desc">${domain.desc}</div>
+  </div>
+  ${qhtml}
+  <div class="assessment-nav no-print">
+    <div>
+      ${prev?`<button class="btn btn-secondary" onclick="goToDomain('${prev}')">← Previous</button>`:'<span></span>'}
+    </div>
+    <div class="nav-info">Domain score: <strong>${dScore}%</strong> ${allAnswered?'✅':''}</div>
+    <div>
+      ${next
+        ?`<button class="btn btn-primary" onclick="goToDomain('${next}')">Next Domain →</button>`
+        :`<button class="btn btn-green" onclick="showDashboard()">Generate Report & KPIs 📊</button>`
+      }
+    </div>
+  </div>`;
+}
+
+function goToDomain(id){
+  state.currentDomain=id;
+  renderAssessment();
+  document.getElementById('assessment-main').scrollTop=0;
+  window.scrollTo(0,0);
+}
+
+function selectOption(key, score, optIdx){
+  if(!state.answerIdx) state.answerIdx={};
+  state.answers[key]=score;
+  state.answerIdx[key]=optIdx;
+  renderAssessment();
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+function showDashboard(){
+  showView('dashboard');
+  renderDashboard();
+}
+
+function renderDashboard(){
+  const score=overallScore();
+  const ml=maturityLevel(score);
+  const domainRows=DOMAINS.map(d=>{
+    const s=domainScore(d.id);
+    const p=PILLARS.find(p=>p.id===d.pillar);
+    const pc=scorePillClass(s);
+    const fc='fill-'+scoreColor(s);
+    const pi=PILLARS.indexOf(p)+1;
+    return `<tr>
+      <td><strong>${d.icon} ${d.label}</strong></td>
+      <td><span class="pillar-tag pt-${pi}">Pillar ${pi}</span></td>
+      <td>${s}%</td>
+      <td><span class="score-pill ${pc}">${s>=80?'Excellent':s>=60?'Good':s>=40?'Fair':s>=20?'Poor':'Critical'}</span></td>
+      <td><div class="inline-bar"><div class="inline-bar-fill ${fc}" style="width:${s}%"></div></div></td>
+    </tr>`;
+  }).join('');
+
+  const recs=generateRecommendations();
+  const recHtml=recs.slice(0,6).map(r=>`
+    <div class="rec-card">
+      <div class="rec-pri rp-${r.priority}">${r.priority==='high'?'!':r.priority==='medium'?'~':'✓'}</div>
+      <div>
+        <div class="rec-domain">${r.domain}</div>
+        <h4>${r.title}</h4>
+        <p>${r.desc}</p>
+      </div>
+    </div>`).join('');
+
+  const pillarScores=PILLARS.map(p=>pillarScore(p.id));
+
+  document.getElementById('dashboard-content').innerHTML=`
+  <div class="dash-header">
+    <div>
+      <h2>Sovereignty Assessment Results</h2>
+      <p>${state.org.name} &bull; ${state.org.country} &bull; ${state.org.date}</p>
+    </div>
+    <div class="dash-actions no-print">
+      <button class="btn btn-secondary" onclick="showView('assessment');renderAssessment()">← Edit Responses</button>
+      <button class="btn btn-outline-blue" onclick="window.print()">🖨️ Print Report</button>
+    </div>
+  </div>
+
+  <div class="dsi-hero">
+    <div class="dsi-score-ring">
+      <canvas id="dsiRing" width="120" height="120"></canvas>
+      <div class="dsi-score-text">
+        <div class="dsi-score-num">${score}</div>
+        <div class="dsi-score-pct">/ 100</div>
+      </div>
+    </div>
+    <div class="dsi-meta">
+      <h3>Digital Sovereignty Index: ${score}</h3>
+      <p>Based on ${answeredCount()} responses across 14 domains and 5 pillars. This index represents your organisation's overall digital sovereignty posture.</p>
+      <span class="maturity-badge ${ml.cls}">${ml.label} Maturity Level</span>
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="kpi-grid"></div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">Pillar Radar — Sovereignty Posture</div>
+      <div class="chart-sub">Score across all five assessment pillars (0–100)</div>
+      <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Pillar Scores — Comparative View</div>
+      <div class="chart-sub">Weighted contribution to overall Digital Sovereignty Index</div>
+      <div class="chart-wrap"><canvas id="pillarBar"></canvas></div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card wide">
+      <div class="chart-title">Domain-Level Scores — All 14 Domains</div>
+      <div class="chart-sub">Granular breakdown across every assessed domain</div>
+      <div class="chart-wrap" style="height:300px"><canvas id="domainBar"></canvas></div>
+    </div>
+  </div>
+
+  <div class="domain-scores-section">
+    <div class="section-heading">
+      <div>
+        <h3>Domain Scorecard</h3>
+        <p>Detailed results across all 14 sovereignty domains</p>
+      </div>
+    </div>
+    <table class="scores-table">
+      <thead><tr><th>Domain</th><th>Pillar</th><th>Score</th><th>Rating</th><th>Visual</th></tr></thead>
+      <tbody>${domainRows}</tbody>
+    </table>
+  </div>
+
+  <div class="recs-section">
+    <h3>Priority Recommendations</h3>
+    <div class="recs-grid">${recHtml}</div>
+  </div>
+
+  <div class="kpi-grid" id="kpi-grid-2"></div>
+  `;
+
+  setTimeout(()=>{
+    renderRingChart(score);
+    renderRadarChart(pillarScores);
+    renderPillarBar(pillarScores);
+    renderDomainBar();
+    renderKPICards();
+  },50);
+}
+
+// ============================================================
+// KPI CARDS
+// ============================================================
+function renderKPICards(){
+  const kpis=generateKPIs();
+  const grid1=kpis.slice(0,8);
+  const grid2=kpis.slice(8);
+
+  function cardHtml(kpi){
+    const vc=kpi.color;
+    const fc='fill-'+vc;
+    return `<div class="kpi-card kpi-${vc}">
+      <div class="kpi-label">${kpi.label}</div>
+      <div class="kpi-value kv-${vc}">${kpi.value}</div>
+      <div class="kpi-sub">${kpi.sub}</div>
+      <div class="kpi-mini-bar"><div class="kpi-mini-bar-fill ${fc}" style="width:${kpi.pct}%"></div></div>
+    </div>`;
+  }
+
+  document.getElementById('kpi-grid').innerHTML=grid1.map(cardHtml).join('');
+  const g2=document.getElementById('kpi-grid-2');
+  if(g2) g2.innerHTML=grid2.map(cardHtml).join('');
+}
+
+function generateKPIs(){
+  const s=n=>domainScore(n);
+  const overall=overallScore();
+  const pillarS=pid=>pillarScore(pid);
+
+  const colorForScore=sc=>{
+    if(sc>=80)return'green';if(sc>=60)return'blue';if(sc>=40)return'amber';return'red';
+  };
+
+  const kpi=(label,rawScore,unit,sub)=>{
+    const pct=rawScore;
+    return {label,value:`${rawScore}${unit||'%'}`,pct,color:colorForScore(rawScore),sub};
+  };
+
+  return [
+    kpi('Digital Sovereignty Index',overall,'','Overall sovereignty posture score'),
+    kpi('Legal & Regulatory Alignment',pillarS('P1'),'','Pillar 1 — legal framework maturity'),
+    kpi('Data Residency Compliance',Math.round((s('residency')+s('cloud'))/2),'','Data localisation and cloud sovereignty'),
+    kpi('Infrastructure Control Score',Math.round((s('infra')+s('cloud'))/2),'','National infrastructure ownership and control'),
+    kpi('Encryption Sovereignty',s('encrypt'),'','Key management and cryptographic standards'),
+    kpi('AI Governance Index',s('aiGov'),'','AI inventory, oversight, and data provenance'),
+    kpi('Vendor Dependency Risk',100-Math.round((s('vendor')+s('vendoraudit'))/2),'%','Inverted: lower = more sovereign (higher risk)'),
+    kpi('Cross-Border Governance',s('crossborder'),'','International data flow controls'),
+    kpi('Critical Infra Resilience',s('critinfra'),'','CNI protection programme maturity'),
+    kpi('IAM Maturity',s('iam'),'','Identity and access management strength'),
+    kpi('Operational Resilience',s('ops'),'','Crisis operation and vendor independence'),
+    kpi('Executive Oversight Index',s('institutional'),'','Board-level accountability and strategy'),
+  ];
+}
+
+// ============================================================
+// RECOMMENDATIONS
+// ============================================================
+function generateRecommendations(){
+  const recs=[];
+  DOMAINS.forEach(d=>{
+    const s=domainScore(d.id);
+    const priority=s<40?'high':s<65?'medium':'low';
+    const actions={
+      legal:'Establish or strengthen a national data protection law with independent DPA enforcement.',
+      dataprotect:'Appoint a qualified DPO, implement systematic DPIAs, and test breach notification procedures.',
+      residency:'Complete a data inventory, enforce residency clauses in all vendor contracts, and verify compliance.',
+      infra:'Increase national ownership of critical IT infrastructure; establish vendor-independent operating procedures.',
+      cloud:'Adopt a sovereign cloud strategy, review all cloud contracts for jurisdiction and exit provisions.',
+      encrypt:'Implement nationally-controlled HSMs, enforce cryptographic standards, and establish key lifecycle governance.',
+      critinfra:'Formalise a CNI register, establish a 24/7 CSIRT with CNI mandate, and conduct annual exercises.',
+      vendor:'Implement a prohibited vendor list, mandate sovereignty clauses in all contracts, and conduct supply chain verification.',
+      crossborder:'Introduce a cross-border transfer policy, complete transfer impact assessments, and maintain a transfer register.',
+      vendoraudit:'Deploy immutable vendor access logging, enforce JIT privileged access, and mandate supervised support sessions.',
+      iam:'Deploy enterprise IAM and PAM, enforce MFA universally, implement zero-trust architecture.',
+      aiGov:'Create a complete AI system inventory, implement AI governance framework, and control training data provenance.',
+      ops:'Develop vendor-independent operating procedures, test sovereign BCP scenarios, and invest in national cyber skills.',
+      institutional:'Appoint a board-level sovereignty executive, establish ring-fenced budget, and define measurable sovereignty KPIs.'
+    };
+    recs.push({domain:d.label,title:`Improve ${d.label}`,desc:actions[d.id],priority,score:s});
+  });
+  return recs.sort((a,b)=>a.score-b.score);
+}
+
+// ============================================================
+// CHARTS
+// ============================================================
+function destroyChart(id){
+  if(state.charts[id]){ state.charts[id].destroy(); delete state.charts[id]; }
+}
+
+function renderRingChart(score){
+  destroyChart('dsi');
+  const ctx=document.getElementById('dsiRing').getContext('2d');
+  state.charts['dsi']=new Chart(ctx,{
+    type:'doughnut',
+    data:{datasets:[{data:[score,100-score],backgroundColor:[scoreColorHex(score),'rgba(255,255,255,0.1)'],borderWidth:0,circumference:360}]},
+    options:{cutout:'72%',plugins:{legend:{display:false},tooltip:{enabled:false}},animation:{duration:1000}}
+  });
+}
+
+function renderRadarChart(scores){
+  destroyChart('radar');
+  const ctx=document.getElementById('radarChart').getContext('2d');
+  state.charts['radar']=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:PILLARS.map(p=>p.label.split(' ').slice(0,3).join(' ')),
+      datasets:[{
+        label:'Score',
+        data:scores,
+        backgroundColor:'rgba(37,99,235,0.15)',
+        borderColor:'#2563eb',
+        borderWidth:2,
+        pointBackgroundColor:'#2563eb',
+        pointRadius:4
+      }]
+    },
+    options:{
+      scales:{r:{min:0,max:100,ticks:{stepSize:20,font:{size:10}},grid:{color:'rgba(0,0,0,0.07)'},pointLabels:{font:{size:11,weight:'700'},color:'#334155'}}},
+      plugins:{legend:{display:false}},
+      animation:{duration:800}
+    }
+  });
+}
+
+function renderPillarBar(scores){
+  destroyChart('pillarBar');
+  const ctx=document.getElementById('pillarBar').getContext('2d');
+  state.charts['pillarBar']=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:PILLARS.map(p=>`P${PILLARS.indexOf(p)+1}`),
+      datasets:[{
+        label:'Pillar Score',
+        data:scores,
+        backgroundColor:scores.map(s=>scoreColorHex(s)+'cc'),
+        borderColor:scores.map(scoreColorHex),
+        borderWidth:2,
+        borderRadius:8
+      }]
+    },
+    options:{
+      scales:{y:{min:0,max:100,ticks:{stepSize:20},grid:{color:'rgba(0,0,0,0.05)'}},x:{grid:{display:false}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Score: ${c.raw}%`}}},
+      animation:{duration:800}
+    }
+  });
+}
+
+function renderDomainBar(){
+  destroyChart('domainBar');
+  const ctx=document.getElementById('domainBar').getContext('2d');
+  const scores=DOMAINS.map(d=>domainScore(d.id));
+  const labels=DOMAINS.map(d=>d.label);
+  state.charts['domainBar']=new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels,
+      datasets:[{
+        label:'Domain Score',
+        data:scores,
+        backgroundColor:scores.map(s=>scoreColorHex(s)+'cc'),
+        borderColor:scores.map(scoreColorHex),
+        borderWidth:1.5,
+        borderRadius:6
+      }]
+    },
+    options:{
+      indexAxis:'y',
+      scales:{
+        x:{min:0,max:100,ticks:{stepSize:20},grid:{color:'rgba(0,0,0,0.05)'}},
+        y:{grid:{display:false},ticks:{font:{size:11}}}
+      },
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.raw}%`}}},
+      animation:{duration:600}
+    }
+  });
+}
+</script>
+</body>
+</html>
