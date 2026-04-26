@@ -1,0 +1,786 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="DDSAT White Paper — A Methodology for Strengthening Government and Critical Infrastructure Digital Sovereignty">
+<title>DDSAT White Paper — Digital & Data Sovereignty Assessment Tool</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,800;1,400;1,600&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & BASE ─────────────────────────────────────────── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f172a;--navy-mid:#1e3a5f;--navy-light:#1e293b;
+  --gold:#f59e0b;--gold-light:#fef3c7;--gold-dark:#d97706;
+  --blue:#2563eb;--green:#059669;--purple:#7c3aed;--rose:#db2777;--amber:#d97706;
+  --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
+  --gray-300:#cbd5e1;--gray-400:#94a3b8;--gray-500:#64748b;
+  --gray-600:#475569;--gray-700:#334155;--gray-800:#1e293b;
+  --body-font:'Inter',sans-serif;
+  --heading-font:'Playfair Display',Georgia,serif;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--body-font);color:var(--gray-800);background:#fff;line-height:1.7}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ─── PRINT ────────────────────────────────────────────────── */
+@media print{
+  .no-print{display:none!important}
+  .page-break{page-break-before:always}
+  body{font-size:11pt}
+  .cover{min-height:100vh}
+  section{page-break-inside:avoid}
+  .doc-footer{position:fixed;bottom:0;left:0;right:0}
+}
+@page{margin:20mm 18mm}
+
+/* ─── NAV BAR (screen only) ────────────────────────────────── */
+.topnav{background:var(--navy);padding:10px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;no-print}
+.topnav-brand{display:flex;align-items:center;gap:10px;color:#fff;font-size:14px;font-weight:700}
+.topnav-logo{width:32px;height:32px;background:linear-gradient(135deg,var(--blue),var(--gold));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;color:#fff}
+.topnav-links{display:flex;gap:18px}
+.topnav-links a{color:rgba(255,255,255,.7);font-size:12px;font-weight:600;text-decoration:none;transition:color .15s}
+.topnav-links a:hover{color:#fff}
+.topnav-btn{background:var(--gold);color:var(--navy);padding:6px 16px;border-radius:6px;font-size:12px;font-weight:800;text-decoration:none;transition:all .15s}
+.topnav-btn:hover{background:var(--gold-dark);color:#fff;text-decoration:none}
+
+/* ─── WRAPPER ───────────────────────────────────────────────── */
+.wp-wrap{max-width:900px;margin:0 auto;padding:0 32px 80px}
+
+/* ─── COVER PAGE ────────────────────────────────────────────── */
+.cover{background:linear-gradient(160deg,var(--navy) 0%,var(--navy-mid) 60%,#1e3a8a 100%);color:#fff;min-height:92vh;display:flex;flex-direction:column;justify-content:center;padding:80px 60px;position:relative;overflow:hidden}
+.cover::before{content:'';position:absolute;top:-80px;right:-80px;width:400px;height:400px;border-radius:50%;border:2px solid rgba(245,158,11,.15)}
+.cover::after{content:'';position:absolute;top:-40px;right:-40px;width:280px;height:280px;border-radius:50%;border:2px solid rgba(245,158,11,.1)}
+.cover-decor{position:absolute;bottom:-60px;left:-60px;width:300px;height:300px;border-radius:50%;border:2px solid rgba(255,255,255,.05)}
+
+/* CSS Shield Icon */
+.shield-wrap{margin-bottom:40px;display:flex;align-items:center;gap:20px}
+.shield{width:80px;height:88px;position:relative}
+.shield-body{width:80px;height:70px;background:linear-gradient(135deg,var(--gold),var(--gold-dark));border-radius:12px 12px 0 0;display:flex;align-items:center;justify-content:center;font-size:28px}
+.shield-tip{width:0;height:0;border-left:40px solid transparent;border-right:40px solid transparent;border-top:22px solid var(--gold-dark)}
+.shield-inner{font-size:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.3))}
+.cover-eyebrow{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px;opacity:.9}
+.cover-title{font-family:var(--heading-font);font-size:38px;font-weight:800;line-height:1.2;letter-spacing:-.5px;margin-bottom:12px;max-width:680px}
+.cover-subtitle{font-size:14px;font-weight:400;color:rgba(255,255,255,.75);margin-bottom:32px;letter-spacing:.3px}
+.cover-abstract{font-size:13.5px;line-height:1.75;color:rgba(255,255,255,.8);max-width:620px;margin-bottom:40px;border-left:3px solid var(--gold);padding-left:20px}
+.cover-meta{display:flex;gap:0;border-top:1px solid rgba(255,255,255,.15);padding-top:28px;flex-wrap:wrap}
+.cover-meta-item{flex:1;min-width:140px;padding:0 24px;border-right:1px solid rgba(255,255,255,.12)}
+.cover-meta-item:first-child{padding-left:0}
+.cover-meta-item:last-child{border-right:none}
+.cover-meta-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,.45);margin-bottom:6px}
+.cover-meta-value{font-size:13px;font-weight:600;color:#fff}
+
+/* ─── TABLE OF CONTENTS ─────────────────────────────────────── */
+.toc-section{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:14px;padding:36px 40px;margin:48px 0}
+.toc-title{font-family:var(--heading-font);font-size:18px;font-weight:700;color:var(--navy);margin-bottom:24px;padding-bottom:12px;border-bottom:2px solid var(--gold)}
+.toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.toc-item{display:flex;align-items:baseline;gap:8px;padding:7px 0;border-bottom:1px dashed var(--gray-200)}
+.toc-num{font-size:12px;font-weight:800;color:var(--gold);min-width:24px}
+.toc-text{font-size:13px;color:var(--gray-700);font-weight:500;flex:1}
+.toc-text a{color:var(--gray-700);text-decoration:none}
+.toc-text a:hover{color:var(--blue)}
+.toc-dots{flex:1;border-bottom:1px dotted var(--gray-300);margin:0 6px;position:relative;top:-3px}
+.toc-page{font-size:11px;color:var(--gray-400);font-weight:600}
+
+/* ─── SECTIONS ──────────────────────────────────────────────── */
+.wp-section{margin-bottom:56px}
+.section-header{margin-bottom:28px}
+.section-eyebrow{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
+.section-title{font-family:var(--heading-font);font-size:28px;font-weight:700;color:var(--navy);line-height:1.2;letter-spacing:-.3px;padding-left:18px;border-left:4px solid var(--gold)}
+.subsection{margin-top:28px;margin-bottom:20px}
+.subsection-title{font-family:var(--heading-font);font-size:18px;font-weight:600;color:var(--navy-mid);margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.subsection-title::before{content:'';display:inline-block;width:4px;height:18px;background:var(--gold);border-radius:2px;flex-shrink:0}
+p{margin-bottom:14px;font-size:14.5px;color:var(--gray-700);line-height:1.8}
+p:last-child{margin-bottom:0}
+
+/* ─── CALLOUT BOX ───────────────────────────────────────────── */
+.callout{border-radius:12px;padding:24px 28px;margin:24px 0}
+.callout-gold{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fcd34d}
+.callout-blue{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #93c5fd}
+.callout-navy{background:var(--navy);color:#fff;border:none}
+.callout-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--gold-dark);margin-bottom:10px}
+.callout-navy .callout-label{color:var(--gold)}
+.callout-title{font-family:var(--heading-font);font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.callout-navy .callout-title{color:#fff}
+.risk-drivers{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.risk-driver{background:rgba(255,255,255,.7);border-radius:8px;padding:14px;border-left:3px solid var(--gold-dark)}
+.risk-driver-num{font-size:20px;font-weight:900;color:var(--gold-dark);line-height:1}
+.risk-driver-title{font-size:12px;font-weight:800;color:var(--navy);margin-top:4px}
+.risk-driver-desc{font-size:11.5px;color:var(--gray-600);margin-top:4px;line-height:1.5}
+
+/* ─── PRINCIPLES GRID ───────────────────────────────────────── */
+.principles-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:24px 0}
+.principle-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:12px;padding:18px 14px;text-align:center;transition:border-color .2s}
+.principle-card:hover{border-color:var(--gold)}
+.principle-icon{font-size:24px;margin-bottom:10px}
+.principle-title{font-size:11px;font-weight:800;color:var(--navy);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px}
+.principle-desc{font-size:11px;color:var(--gray-500);line-height:1.5}
+
+/* ─── PILLAR TABLE ───────────────────────────────────────────── */
+.pillar-table{width:100%;border-collapse:collapse;margin:24px 0;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.pillar-table th{background:var(--navy);color:#fff;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.8px;padding:12px 16px;text-align:left}
+.pillar-table td{padding:14px 16px;font-size:13.5px;border-bottom:1px solid var(--gray-100);vertical-align:middle}
+.pillar-table tr:last-child td{border-bottom:none}
+.pillar-table tr:hover td{background:var(--gray-50)}
+.pillar-table tr:nth-child(odd) td{background:#fafafa}
+.pillar-color{width:14px;height:14px;border-radius:4px;display:inline-block;vertical-align:middle;margin-right:8px}
+.pillar-name-cell{font-weight:700;color:var(--navy)}
+.weight-badge{display:inline-block;background:var(--gold-light);color:var(--gold-dark);font-size:11px;font-weight:800;padding:2px 10px;border-radius:20px;border:1px solid #fcd34d}
+
+/* ─── DOMAIN CARDS ───────────────────────────────────────────── */
+.domains-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+.domain-card{background:#fff;border:1.5px solid var(--gray-200);border-radius:12px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start}
+.domain-card:hover{border-color:var(--gray-300);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.domain-icon{font-size:22px;flex-shrink:0;margin-top:1px}
+.domain-info{}
+.domain-name{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:3px}
+.domain-desc-card{font-size:11.5px;color:var(--gray-500);line-height:1.5}
+.domain-pillar-tag{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;display:inline-block;padding:1px 7px;border-radius:20px;margin-bottom:5px}
+.pt1{background:#ede9fe;color:#6d28d9}
+.pt2{background:#dbeafe;color:#1d4ed8}
+.pt3{background:#fce7f3;color:#9d174d}
+.pt4{background:#d1fae5;color:#065f46}
+.pt5{background:#fef9c3;color:#713f12}
+
+/* ─── FORMULA BOX ────────────────────────────────────────────── */
+.formula-box{background:var(--gray-50);border:2px solid var(--gray-200);border-radius:10px;padding:20px 24px;margin:20px 0;font-family:'Courier New',Courier,monospace}
+.formula-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray-400);margin-bottom:10px;font-family:var(--body-font)}
+.formula-line{font-size:13px;color:var(--navy);margin-bottom:6px;line-height:1.6}
+.formula-line strong{color:var(--blue)}
+.formula-note{font-size:11px;color:var(--gray-500);margin-top:10px;font-family:var(--body-font);line-height:1.5}
+
+/* ─── MATURITY BAR ───────────────────────────────────────────── */
+.maturity-container{margin:24px 0}
+.maturity-bar{display:flex;height:36px;border-radius:10px;overflow:hidden;box-shadow:0 2px 6px rgba(0,0,0,.1)}
+.mat-seg{display:flex;align-items:center;justify-content:center;flex:1;font-size:10px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:.5px;position:relative}
+.mat-initial{background:#ef4444}
+.mat-developing{background:#f97316}
+.mat-defined{background:#f59e0b}
+.mat-managed{background:#2563eb}
+.mat-optimizing{background:#10b981}
+.maturity-labels{display:flex;margin-top:8px}
+.mat-label{flex:1;text-align:center;font-size:10px;color:var(--gray-500);font-weight:600}
+.maturity-levels{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:20px}
+.mat-level-card{border-radius:10px;padding:14px;border:1px solid var(--gray-200)}
+.mat-level-card.ml-initial{border-left:4px solid #ef4444;background:#fff5f5}
+.mat-level-card.ml-developing{border-left:4px solid #f97316;background:#fff7ed}
+.mat-level-card.ml-defined{border-left:4px solid #f59e0b;background:#fffbeb}
+.mat-level-card.ml-managed{border-left:4px solid #2563eb;background:#eff6ff}
+.mat-level-card.ml-optimizing{border-left:4px solid #10b981;background:#f0fdf4}
+.mat-level-name{font-size:11px;font-weight:800;color:var(--navy);margin-bottom:4px}
+.mat-level-range{font-size:10px;font-weight:700;margin-bottom:6px}
+.mat-level-range.r-initial{color:#ef4444}.mat-level-range.r-developing{color:#f97316}.mat-level-range.r-defined{color:#f59e0b}.mat-level-range.r-managed{color:#2563eb}.mat-level-range.r-optimizing{color:#10b981}
+.mat-level-desc{font-size:10.5px;color:var(--gray-600);line-height:1.5}
+
+/* ─── KPI TABLE ──────────────────────────────────────────────── */
+.kpi-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:12.5px}
+.kpi-table th{background:var(--navy);color:#fff;padding:11px 14px;text-align:left;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px}
+.kpi-table td{padding:12px 14px;border-bottom:1px solid var(--gray-100);vertical-align:top;line-height:1.5}
+.kpi-table tr:hover td{background:var(--gray-50)}
+.kpi-name{font-weight:700;color:var(--navy)}
+.kpi-formula{font-family:monospace;font-size:11px;color:var(--gray-600);display:block;margin-top:3px}
+.threshold-g{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800;background:#dcfce7;color:#15803d}
+.threshold-a{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800;background:#fef9c3;color:#854d0e}
+.threshold-r{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:800;background:#fee2e2;color:#991b1b}
+
+/* ─── OUTCOME CARDS ──────────────────────────────────────────── */
+.outcome-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:28px 0}
+.outcome-card{border-radius:14px;padding:24px;position:relative;overflow:hidden}
+.outcome-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+.oc-citizen{background:linear-gradient(135deg,#eff6ff,#dbeafe);border:1px solid #bfdbfe}
+.oc-citizen::before{background:var(--blue)}
+.oc-infra{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0}
+.oc-infra::before{background:var(--green)}
+.oc-continuity{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a}
+.oc-continuity::before{background:var(--gold)}
+.oc-icon{font-size:28px;margin-bottom:10px}
+.oc-title{font-family:var(--heading-font);font-size:15px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.oc-desc{font-size:12px;color:var(--gray-600);line-height:1.6}
+
+/* ─── ROADMAP ────────────────────────────────────────────────── */
+.roadmap{position:relative;margin:28px 0}
+.roadmap-line{position:absolute;left:26px;top:30px;bottom:30px;width:2px;background:linear-gradient(180deg,var(--blue),var(--green));border-radius:2px}
+.roadmap-phase{display:flex;gap:20px;align-items:flex-start;margin-bottom:24px;position:relative}
+.phase-dot{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;flex-shrink:0;position:relative;z-index:1;box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.pd-1{background:linear-gradient(135deg,#6366f1,#4f46e5)}
+.pd-2{background:linear-gradient(135deg,var(--blue),#1d4ed8)}
+.pd-3{background:linear-gradient(135deg,#0ea5e9,#0284c7)}
+.pd-4{background:linear-gradient(135deg,var(--green),#047857)}
+.phase-content{flex:1;background:#fff;border:1.5px solid var(--gray-200);border-radius:12px;padding:18px 20px}
+.phase-timing{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--gray-400);margin-bottom:5px}
+.phase-title{font-size:14px;font-weight:800;color:var(--navy);margin-bottom:8px}
+.phase-items{list-style:none;padding:0}
+.phase-items li{font-size:12.5px;color:var(--gray-600);padding:3px 0;display:flex;align-items:baseline;gap:7px;line-height:1.5}
+.phase-items li::before{content:'›';color:var(--gold-dark);font-weight:900;flex-shrink:0}
+
+/* ─── GLOSSARY ───────────────────────────────────────────────── */
+.glossary-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.glossary-item{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:10px;padding:14px 16px}
+.glossary-term{font-size:12px;font-weight:800;color:var(--navy);margin-bottom:5px}
+.glossary-def{font-size:11.5px;color:var(--gray-600);line-height:1.6}
+
+/* ─── DOC FOOTER ─────────────────────────────────────────────── */
+.doc-footer{background:var(--gray-50);border-top:1px solid var(--gray-200);padding:14px 0;margin-top:60px;text-align:center;font-size:11px;color:var(--gray-400)}
+.doc-footer strong{color:var(--gray-600)}
+
+/* ─── DIVIDER ────────────────────────────────────────────────── */
+.section-divider{border:none;border-top:1px solid var(--gray-200);margin:48px 0}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:768px){
+  .cover{padding:48px 28px;min-height:auto}
+  .cover-title{font-size:26px}
+  .toc-grid{grid-template-columns:1fr}
+  .principles-grid{grid-template-columns:repeat(2,1fr)}
+  .domains-grid{grid-template-columns:1fr}
+  .outcome-cards{grid-template-columns:1fr}
+  .maturity-levels{grid-template-columns:1fr 1fr}
+  .risk-drivers{grid-template-columns:1fr}
+  .glossary-grid{grid-template-columns:1fr}
+  .cover-meta{flex-direction:column;gap:16px}
+  .cover-meta-item{border-right:none;border-bottom:1px solid rgba(255,255,255,.1);padding:0 0 16px 0}
+  .wp-wrap{padding:0 16px 60px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV (screen only) -->
+<nav class="topnav no-print">
+  <div class="topnav-brand">
+    <div class="topnav-logo">DS</div>
+    <span>DDSAT White Paper</span>
+  </div>
+  <div class="topnav-links">
+    <a href="#executive-summary">Executive Summary</a>
+    <a href="#imperative">Sovereignty Imperative</a>
+    <a href="#framework">Framework</a>
+    <a href="#pillars">Five Pillars</a>
+    <a href="#scoring">Scoring</a>
+    <a href="#kpis">KPIs</a>
+    <a href="#outcomes">Outcomes</a>
+  </div>
+  <a href="DDSAT_DEMO.html" class="topnav-btn no-print">▶ Try the Tool</a>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════
+     COVER PAGE
+══════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-decor"></div>
+  <div class="shield-wrap">
+    <div class="shield">
+      <div class="shield-body"><span class="shield-inner">🛡</span></div>
+      <div class="shield-tip"></div>
+    </div>
+  </div>
+  <div class="cover-eyebrow">White Paper · Digital Sovereignty</div>
+  <h1 class="cover-title">Digital &amp; Data Sovereignty Assessment Tool (DDSAT): A Methodology for Strengthening Government and Critical Infrastructure Digital Sovereignty</h1>
+  <p class="cover-subtitle">Protecting Citizen Data &nbsp;·&nbsp; Governing Digital Infrastructure &nbsp;·&nbsp; Ensuring Continuity of Service Delivery</p>
+  <p class="cover-abstract">
+    As governments and critical infrastructure operators face accelerating digital transformation, the risks of technological dependency, extraterritorial legal exposure, and loss of sovereign control over data and infrastructure have never been greater. The Digital &amp; Data Sovereignty Assessment Tool (DDSAT) provides a structured, quantitative methodology to evaluate an organisation's sovereignty posture across 14 domains and five pillars, generating a Digital Sovereignty Index and actionable KPIs to guide strategic investment and policy decisions.
+  </p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><div class="cover-meta-label">Version</div><div class="cover-meta-value">1.0</div></div>
+    <div class="cover-meta-item"><div class="cover-meta-label">Date</div><div class="cover-meta-value">April 2026</div></div>
+    <div class="cover-meta-item"><div class="cover-meta-label">Classification</div><div class="cover-meta-value">PUBLIC</div></div>
+    <div class="cover-meta-item"><div class="cover-meta-label">Audience</div><div class="cover-meta-value">Government · CNI · Regulators</div></div>
+    <div class="cover-meta-item"><div class="cover-meta-label">Domains Assessed</div><div class="cover-meta-value">14 across 5 Pillars</div></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN DOCUMENT
+══════════════════════════════════════════════════════════ -->
+<div class="wp-wrap">
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc-section no-print">
+  <div class="toc-title">Table of Contents</div>
+  <div class="toc-grid">
+    <div class="toc-item"><span class="toc-num">1</span><span class="toc-text"><a href="#executive-summary">Executive Summary</a></span></div>
+    <div class="toc-item"><span class="toc-num">7</span><span class="toc-text"><a href="#kpis">Key Performance Indicators</a></span></div>
+    <div class="toc-item"><span class="toc-num">2</span><span class="toc-text"><a href="#imperative">The Digital Sovereignty Imperative</a></span></div>
+    <div class="toc-item"><span class="toc-num">8</span><span class="toc-text"><a href="#outcomes">Strategic Outcomes</a></span></div>
+    <div class="toc-item"><span class="toc-num">3</span><span class="toc-text"><a href="#framework">DDSAT Conceptual Framework</a></span></div>
+    <div class="toc-item"><span class="toc-num">9</span><span class="toc-text"><a href="#roadmap">Implementation Roadmap</a></span></div>
+    <div class="toc-item"><span class="toc-num">4</span><span class="toc-text"><a href="#pillars">Five-Pillar Architecture</a></span></div>
+    <div class="toc-item"><span class="toc-num">10</span><span class="toc-text"><a href="#conclusion">Conclusion</a></span></div>
+    <div class="toc-item"><span class="toc-num">5</span><span class="toc-text"><a href="#domains">The 14 Assessment Domains</a></span></div>
+    <div class="toc-item"><span class="toc-num">—</span><span class="toc-text"><a href="#glossary">Glossary of Key Terms</a></span></div>
+    <div class="toc-item"><span class="toc-num">6</span><span class="toc-text"><a href="#scoring">Scoring Methodology &amp; Maturity Model</a></span></div>
+    <div class="toc-item"></div>
+  </div>
+</div>
+
+<hr class="section-divider">
+
+<!-- ── SECTION 1: EXECUTIVE SUMMARY ────────────────────────── -->
+<section class="wp-section" id="executive-summary">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 01</div>
+    <h2 class="section-title">Executive Summary</h2>
+  </div>
+
+  <p>Governments and critical infrastructure operators around the world are confronting an unprecedented challenge: as they digitise public services, the very systems upon which citizens and economies depend are increasingly owned, operated, and governed by foreign entities beyond national regulatory reach. Data is processed across jurisdictions. Cloud platforms concentrate infrastructure in the hands of a small number of non-domestic hyperscalers. Artificial intelligence systems trained on foreign data and governed by foreign law make consequential decisions affecting millions of citizens. Meanwhile, the legal frameworks required to govern this landscape often lag a decade or more behind technological reality.</p>
+
+  <p>The <strong>Digital &amp; Data Sovereignty Assessment Tool (DDSAT)</strong> was developed in response to this challenge. It provides governments, regulatory authorities, and critical infrastructure operators with a rigorous, structured methodology to evaluate their current sovereignty posture, identify gaps, and generate a quantitative baseline for strategic planning and remediation. DDSAT is not a compliance checklist — it is a maturity assessment framework that measures where an organisation sits on a five-level scale from <em>Initial / Ad-hoc</em> to <em>Optimizing</em>, across the full breadth of what it means to exercise genuine digital sovereignty in the modern era.</p>
+
+  <p>The tool is organised around <strong>five strategic pillars</strong>, each addressing a distinct dimension of sovereignty: Legal &amp; Regulatory Alignment; Data Localization &amp; Infrastructure; Critical Infrastructure Protection; Cross-Border Data Flow Governance; and Institutional Capacity &amp; Oversight. Across these pillars, DDSAT assesses <strong>14 domains</strong> through <strong>84 structured questions</strong>, producing domain-level scores, pillar scores, and an aggregate <strong>Digital Sovereignty Index (DSI)</strong> — a single, quantifiable measure of an organisation's overall sovereign posture on a 0–100 scale.</p>
+
+  <p>From this assessment, DDSAT generates <strong>12 Key Performance Indicators (KPIs)</strong> that translate technical findings into executive-level metrics suitable for board reporting, ministerial briefings, and inter-agency benchmarking. Prioritised recommendations — ranked by severity and strategic impact — provide a clear remediation pathway aligned to the organisation's maturity level and resource constraints.</p>
+
+  <p>Three core strategic outcomes anchor DDSAT's design. First, <strong>protecting citizen data</strong>: ensuring that personal data collected by government is handled lawfully, stored within appropriate jurisdictions, and protected from unlawful foreign access. Second, <strong>controlling and governing digital infrastructure</strong>: ensuring that the systems upon which public services depend remain under national authority and cannot be disrupted, disabled, or exploited by foreign actors. Third, <strong>ensuring continuity of service delivery</strong>: guaranteeing that governments can maintain essential services for citizens even in the face of cyberattacks, geopolitical disruption, or the withdrawal of foreign technology providers.</p>
+
+  <p>Digital sovereignty is not an end state — it is an ongoing practice of governance. DDSAT provides the baseline measurement, the strategic language, and the executive visibility that governments need to make sovereignty a sustained organisational priority rather than a reactive afterthought.</p>
+</section>
+
+<hr class="section-divider page-break">
+
+<!-- ── SECTION 2: THE DIGITAL SOVEREIGNTY IMPERATIVE ─────── -->
+<section class="wp-section" id="imperative">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 02</div>
+    <h2 class="section-title">The Digital Sovereignty Imperative</h2>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">2.1 &nbsp;Defining Digital Sovereignty</h3>
+    <p>Digital sovereignty refers to the capacity of a state, government, or organisation to exercise autonomous authority over its digital assets, data flows, and technological infrastructure — free from undue dependence on, or control by, foreign entities or extraterritorial legal regimes. It encompasses five interconnected dimensions:</p>
+    <p><strong>Data Residency &amp; Jurisdictional Control</strong> — the ability to determine where data is physically stored and processed, ensuring it remains subject to national law and cannot be accessed by foreign authorities without due legal process under domestic frameworks.</p>
+    <p><strong>Infrastructure Ownership &amp; Operational Control</strong> — the extent to which a government owns, operates, or can independently control the technology stack underpinning its critical systems, including hardware, networks, software platforms, and cloud services.</p>
+    <p><strong>Regulatory Jurisdiction</strong> — the capacity to enforce national data protection, cybersecurity, and sector-specific laws against all entities processing data or operating infrastructure within the national interest, including foreign technology providers.</p>
+    <p><strong>AI Governance &amp; Algorithmic Autonomy</strong> — the ability to understand, audit, and where necessary override or replace artificial intelligence systems used in public administration, including control over the data on which those systems are trained and the jurisdictions in which inference occurs.</p>
+    <p><strong>Operational Independence</strong> — the capacity to maintain critical public services without existential dependency on foreign vendors, foreign-controlled infrastructure, or technology components subject to export controls, sanctions, or geopolitical disruption.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">2.2 &nbsp;The Threat Landscape</h3>
+    <p>The threats to digital sovereignty are systemic, structural, and accelerating. They are not primarily the product of deliberate hostile action — though that too is increasing — but rather of the organic evolution of global technology markets in ways that have been profoundly asymmetric in their distribution of power and control.</p>
+    <p><strong>Foreign Technology Dependency.</strong> The global cloud infrastructure market is dominated by three US-headquartered hyperscalers — Amazon Web Services, Microsoft Azure, and Google Cloud — which collectively hold over 65% of global cloud market share. For most governments, a substantial and growing proportion of their critical IT infrastructure now runs on platforms subject to US jurisdiction, including the US CLOUD Act (2018), which gives American law enforcement broad authority to compel the disclosure of data held by US companies regardless of where that data is physically stored.</p>
+    <p><strong>Supply Chain Vulnerabilities.</strong> Modern technology supply chains are extraordinarily complex and globally distributed. Hardware components — from microprocessors to network routers — routinely contain firmware or components sourced from jurisdictions with adversarial interests. Software supply chains are equally exposed: the SolarWinds breach of 2020 demonstrated how a single compromised software update could grant adversaries persistent access to thousands of government and critical infrastructure systems worldwide.</p>
+    <p><strong>Cross-Border Data Exposure.</strong> Cloud computing, multinational service providers, and the architectural choices of commercial software platforms mean that government data routinely traverses multiple jurisdictions — often without the knowledge of the organisations generating it. Standard contractual clauses and data processing agreements provide a legal framework, but offer no protection against lawful foreign government access orders or against the practical reality that data centres in foreign jurisdictions are subject to foreign law.</p>
+    <p><strong>AI Model Opacity &amp; Foreign Dependency.</strong> Governments are increasingly deploying AI systems in consequential public sector contexts — from benefits assessment to criminal justice, border control, and public health. Many of these systems are built on large foundation models developed and trained by foreign entities, on data that may include sensitive government information, under terms that often preclude meaningful audit or explainability. The provenance of training data, the nature of model alignment, and the identity of the entity retaining model weights are often opaque.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">2.3 &nbsp;Why Governments Must Act Now</h3>
+    <p>The convergence of regulatory fragmentation, technological acceleration, geopolitical tension, and citizen expectation has created an urgent imperative for governments to assess and strengthen their sovereign digital posture. Several trends make this particularly pressing:</p>
+    <p>Cloud concentration is increasing, not decreasing. As governments migrate legacy systems to cloud infrastructure, their dependency on a small number of foreign platforms deepens. Migration costs and vendor lock-in dynamics make exit progressively more difficult and expensive over time, meaning that decisions made today may constrain sovereignty options for a decade or more.</p>
+    <p>AI proliferation is outpacing governance. The rapid adoption of generative AI and large language models in public sector workflows is creating new vectors for data exfiltration, new forms of algorithmic dependency, and new risks of sovereign decision-making being delegated to opaque, foreign-controlled systems — often without appropriate policy frameworks or oversight mechanisms in place.</p>
+    <p>Citizens increasingly expect governments to protect their data and maintain service continuity. The digital social contract between citizens and states is evolving: citizens expect that the personal data they share with government will be handled with the highest standards of protection, that public services will be available consistently, and that government will not be complicit in their data being accessible to foreign powers.</p>
+  </div>
+
+  <div class="callout callout-gold">
+    <div class="callout-label">Key Risk Drivers</div>
+    <div class="callout-title">Four Structural Risks to Digital Sovereignty</div>
+    <div class="risk-drivers">
+      <div class="risk-driver"><div class="risk-driver-num">01</div><div class="risk-driver-title">Cloud Concentration</div><div class="risk-driver-desc">Over 65% of global cloud market controlled by three US-headquartered hyperscalers, creating systemic foreign dependency for most governments.</div></div>
+      <div class="risk-driver"><div class="risk-driver-num">02</div><div class="risk-driver-title">Extraterritorial Law</div><div class="risk-driver-desc">The US CLOUD Act, China's Data Security Law, and similar instruments allow foreign governments to compel access to data regardless of physical location.</div></div>
+      <div class="risk-driver"><div class="risk-driver-num">03</div><div class="risk-driver-title">AI Governance Gap</div><div class="risk-driver-desc">Rapid AI adoption in public services is outpacing regulatory frameworks, creating dependency on opaque, foreign-controlled models with unknown alignment properties.</div></div>
+      <div class="risk-driver"><div class="risk-driver-num">04</div><div class="risk-driver-title">Supply Chain Opacity</div><div class="risk-driver-desc">Hardware and software components sourced globally introduce unknown vulnerabilities; even trusted vendors may be subject to foreign intelligence service influence.</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider page-break">
+
+<!-- ── SECTION 3: DDSAT CONCEPTUAL FRAMEWORK ─────────────── -->
+<section class="wp-section" id="framework">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 03</div>
+    <h2 class="section-title">DDSAT Conceptual Framework</h2>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">3.1 &nbsp;Purpose and Scope</h3>
+    <p>DDSAT is designed to provide organisations with a systematic, evidence-based method for evaluating their current digital sovereignty posture. Unlike compliance frameworks that assess adherence to a fixed set of rules, DDSAT measures capability maturity — enabling organisations to understand not just whether they have a policy in place, but whether that policy is effectively implemented, monitored, tested, and continuously improved.</p>
+    <p>The tool is designed for use by three primary audience groups: <strong>national governments and central government departments</strong> seeking to understand and improve their whole-of-government sovereignty posture; <strong>regulatory authorities</strong> wishing to assess the sovereignty dimensions of regulated sectors; and <strong>critical infrastructure operators</strong> — including organisations in energy, water, telecommunications, finance, transport, and health — who must ensure that the systems underpinning essential services remain under appropriate national control.</p>
+    <p>DDSAT is scoped to cover the breadth of digital sovereignty: it is not solely a cybersecurity assessment, nor a data protection compliance audit, nor a cloud strategy review — though it encompasses all three. Its distinctive value lies in integrating these dimensions into a single, coherent sovereignty framework that produces a unified index and enables cross-domain prioritisation.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">3.2 &nbsp;Design Principles</h3>
+  </div>
+
+  <div class="principles-grid">
+    <div class="principle-card"><div class="principle-icon">🌐</div><div class="principle-title">Comprehensive Coverage</div><div class="principle-desc">Addresses all material dimensions of digital sovereignty from legal through to AI, across 14 domains and 84 questions.</div></div>
+    <div class="principle-card"><div class="principle-icon">📈</div><div class="principle-title">Maturity-Based</div><div class="principle-desc">Measures capability on a five-level scale rather than binary pass/fail, enabling nuanced gap identification and improvement tracking.</div></div>
+    <div class="principle-card"><div class="principle-icon">🎯</div><div class="principle-title">Actionable Outputs</div><div class="principle-desc">Every assessment produces prioritised recommendations, domain scores, and a DSI suitable for executive reporting and board-level decision-making.</div></div>
+    <div class="principle-card"><div class="principle-icon">📊</div><div class="principle-title">Quantifiable KPIs</div><div class="principle-desc">Generates 12 KPIs that translate assessment findings into measurable, trackable metrics aligned to strategic and operational goals.</div></div>
+    <div class="principle-card"><div class="principle-icon">🔓</div><div class="principle-title">Vendor-Neutral</div><div class="principle-desc">Assessment criteria are technology and vendor agnostic, focusing on sovereignty outcomes rather than specific product choices.</div></div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">3.3 &nbsp;Relationship to International Standards</h3>
+    <p>DDSAT does not seek to replace existing international standards and frameworks — rather, it complements and integrates them within a sovereignty-specific lens. Organisations that have implemented controls aligned to <strong>ISO/IEC 27001</strong> (information security management) will find their investments reflected in DDSAT's encryption, IAM, and vendor management domains. Those operating under <strong>NIST CSF 2.0</strong> will find natural alignment with DDSAT's critical infrastructure and operational sovereignty domains.</p>
+    <p>The <strong>EU NIS2 Directive</strong> (2022) and its national transpositions introduce mandatory cybersecurity and incident reporting requirements for essential entities across critical sectors; DDSAT's critical infrastructure and operational sovereignty pillars directly assess compliance-relevant capabilities. The <strong>GDPR</strong> and equivalent national data protection laws underpin DDSAT's legal alignment and data protection domains. Finally, <strong>ENISA's Cloud Computing Risk Assessment</strong> and the EU's evolving AI Act inform DDSAT's cloud sovereignty and AI governance domains respectively.</p>
+    <p>Where an organisation already holds relevant certifications or has undergone recent external audits, DDSAT assessors should use those findings as evidential inputs to the scoring process, avoiding duplication of effort while ensuring the sovereignty-specific dimensions that those frameworks do not address are fully evaluated.</p>
+  </div>
+</section>
+
+<hr class="section-divider page-break">
+
+<!-- ── SECTION 4: THE FIVE-PILLAR ARCHITECTURE ───────────── -->
+<section class="wp-section" id="pillars">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 04</div>
+    <h2 class="section-title">The Five-Pillar Assessment Architecture</h2>
+  </div>
+
+  <p>DDSAT's assessment is structured around five strategic pillars, each representing a distinct and essential dimension of digital sovereignty. Together they ensure that no material aspect of sovereign digital governance is omitted. The pillars are weighted to reflect their relative strategic importance and the volume of assessment coverage they require.</p>
+
+  <table class="pillar-table">
+    <thead><tr><th>#</th><th>Pillar</th><th>Weight</th><th>Domains</th><th>Questions</th></tr></thead>
+    <tbody>
+      <tr><td>P1</td><td><span class="pillar-color" style="background:#7c3aed"></span><span class="pillar-name-cell">Legal &amp; Regulatory Alignment</span></td><td><span class="weight-badge">20%</span></td><td>2</td><td>12</td></tr>
+      <tr><td>P2</td><td><span class="pillar-color" style="background:#2563eb"></span><span class="pillar-name-cell">Data Localization &amp; Infrastructure</span></td><td><span class="weight-badge">25%</span></td><td>4</td><td>25</td></tr>
+      <tr><td>P3</td><td><span class="pillar-color" style="background:#db2777"></span><span class="pillar-name-cell">Critical Infrastructure Protection</span></td><td><span class="weight-badge">20%</span></td><td>2</td><td>12</td></tr>
+      <tr><td>P4</td><td><span class="pillar-color" style="background:#059669"></span><span class="pillar-name-cell">Cross-Border Data Flow Governance</span></td><td><span class="weight-badge">15%</span></td><td>2</td><td>12</td></tr>
+      <tr><td>P5</td><td><span class="pillar-color" style="background:#d97706"></span><span class="pillar-name-cell">Institutional Capacity &amp; Oversight</span></td><td><span class="weight-badge">20%</span></td><td>4</td><td>23</td></tr>
+    </tbody>
+  </table>
+
+  <div class="subsection">
+    <h3 class="subsection-title" style="color:#6d28d9">Pillar 1 &nbsp;— Legal &amp; Regulatory Alignment</h3>
+    <p>The legal and regulatory pillar establishes the foundational architecture of digital sovereignty. Without an adequate legislative framework, the most technically sophisticated sovereignty measures lack the force of law and cannot be consistently enforced. This pillar assesses the existence, scope, and enforcement effectiveness of national data protection legislation; the independence and capacity of the designated Data Protection Authority or equivalent regulatory body; the legal basis for all government data processing activities; and the legislative treatment of data localisation, AI governance, and cross-border data transfers.</p>
+    <p>Critically, DDSAT does not merely assess whether legislation exists — it evaluates whether that legislation is actively enforced, whether compliance assessments are conducted on a regular cycle, and whether the regulatory ecosystem is sufficiently resourced to exercise meaningful oversight. Nations with strong legal frameworks on paper but weak institutional capacity for enforcement score no higher than nations whose frameworks are still developing, reflecting the reality that sovereignty without enforcement is merely aspirational.</p>
+    <p>The rapid proliferation of AI in public sector contexts makes the AI governance dimension of this pillar particularly salient. Jurisdictions that have enacted comprehensive AI regulation — or are in advanced stages of doing so — provide their governments with far stronger sovereign foundations for AI deployment than those relying on general data protection law or voluntary codes of practice.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title" style="color:#1d4ed8">Pillar 2 &nbsp;— Data Localization &amp; Infrastructure</h3>
+    <p>This pillar, carrying the highest weighting in the DDSAT framework at 25%, addresses the physical and technical dimensions of sovereignty: where data is stored and processed, who owns and operates the infrastructure on which government systems run, whether cloud services are governed by appropriate sovereignty provisions, and whether encryption keys remain under national control. It is weighted most heavily because it represents the domain in which the gap between stated policy and practical sovereignty is typically greatest — and where the consequences of failure are most direct.</p>
+    <p>The data residency domain examines the completeness of data inventories, the percentage of sensitive government data stored within national jurisdiction, the contractual and technical controls enforcing residency requirements, and the consistency of DR and backup system treatment with primary system sovereignty requirements. The infrastructure control domain evaluates the proportion of critical IT infrastructure nationally owned, the organisation's ability to operate without foreign vendor support, and the quality of supply chain security practices. The cloud sovereignty domain examines whether a coherent sovereign cloud strategy exists, whether exit provisions are in place to prevent lock-in, and whether logging and monitoring data is retained nationally. The encryption domain assesses key ownership, HSM deployment, cryptographic standards, and key lifecycle governance — areas where a failure of sovereignty can negate all other technical controls.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title" style="color:#9d174d">Pillar 3 &nbsp;— Critical Infrastructure Protection</h3>
+    <p>Critical national infrastructure represents the systems whose disruption would have the most severe consequences for public safety, economic stability, and national security. This pillar assesses the maturity of an organisation's approach to identifying, protecting, and ensuring the resilience of these systems. It encompasses the existence and currency of a formal CNI register; the resourcing and operational maturity of a Critical Infrastructure Protection programme; the completeness of cyber-physical dependency mapping; the operational capability of the national CSIRT or SOC with a specific CNI mandate; and the adequacy of tested incident response and recovery plans for CNI disruptions.</p>
+    <p>A dimension of particular sovereign significance is the assessment of foreign investment screening for critical infrastructure. The acquisition of critical infrastructure assets — or of vendors providing critical services to those assets — by entities controlled by foreign governments or associated with foreign intelligence services represents one of the most direct threats to digital sovereignty. Jurisdictions that have established mandatory, enforceable foreign investment review mechanisms for CNI provide substantially stronger sovereign protections than those relying on voluntary disclosure or post-acquisition monitoring.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title" style="color:#065f46">Pillar 4 &nbsp;— Cross-Border Data Flow Governance</h3>
+    <p>Data does not respect borders, and the governance of cross-border data flows is one of the most technically and legally complex dimensions of sovereignty. This pillar assesses the existence and enforcement of policies governing international data transfers; the conduct of Transfer Impact Assessments prior to any international data flows; the deployment of appropriate transfer mechanisms (Standard Contractual Clauses, Binding Corporate Rules, adequacy decisions, or equivalent national instruments); the maintenance of a complete and audited register of all international transfers; the deployment of technical controls to prevent unauthorised cross-border flows; and the organisation's engagement with international data governance frameworks and treaties.</p>
+    <p>The vendor access audit domain is equally critical: it assesses whether vendor access to sensitive systems is comprehensively logged, whether vendor access rights are regularly recertified, whether privileged access is controlled through just-in-time mechanisms, whether vendors are contractually and technically restricted from accessing data outside agreed jurisdictional parameters, and whether an immutable, tamper-protected audit trail exists for all vendor activities. These controls represent the last line of sovereign defence against data exfiltration through legitimate access channels.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title" style="color:#713f12">Pillar 5 &nbsp;— Institutional Capacity &amp; Oversight</h3>
+    <p>Sovereign capability without sovereign intent, leadership, and sustained investment is meaningless. This pillar assesses the organisational and human dimensions of digital sovereignty: whether there is a designated executive role with formal sovereignty responsibility and board-level accountability; whether leadership receives regular, structured sovereignty briefings; whether a dedicated, protected budget exists for sovereignty initiatives; whether an approved, current sovereignty strategy is in place; whether accountability frameworks and KPIs have been defined; and whether processes exist to identify and escalate emerging sovereignty threats to executive level.</p>
+    <p>The identity and access management domain underpins sovereign control of who accesses government systems and data — assessing IAM framework maturity, MFA enforcement, PAM deployment, zero-trust architecture, and national PKI adoption. The AI governance domain extends sovereign oversight into the rapidly evolving domain of artificial intelligence. The operational sovereignty domain examines the organisation's capacity to maintain services without foreign dependencies during crises — including skills strategy, vendor-independent procedures, and BCP scenarios explicitly addressing sovereign risk. Together, these domains assess whether sovereignty is institutionalised as an enduring organisational discipline rather than a reactive response to incident or political pressure.</p>
+  </div>
+</section>
+
+<hr class="section-divider page-break">
+
+<!-- ── SECTION 5: THE 14 ASSESSMENT DOMAINS ──────────────── -->
+<section class="wp-section" id="domains">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 05</div>
+    <h2 class="section-title">The 14 Assessment Domains</h2>
+  </div>
+  <p>Each pillar is subdivided into domains — the discrete areas of sovereignty that the assessment evaluates through targeted questions. The 14 domains are listed below, grouped by pillar, with a summary of each domain's scope.</p>
+
+  <div class="domains-grid">
+    <div class="domain-card"><div class="domain-icon">⚖️</div><div class="domain-info"><span class="domain-pillar-tag pt1">Pillar 1</span><div class="domain-name">Legal &amp; Regulatory Framework</div><div class="domain-desc-card">National data protection law, DPA independence and enforcement capacity, legal bases for data processing, data localisation mandates, and AI governance legislation.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🔐</div><div class="domain-info"><span class="domain-pillar-tag pt1">Pillar 1</span><div class="domain-name">Data Protection Compliance</div><div class="domain-desc-card">DPO designation, DPIA implementation, privacy-by-design, breach notification procedures, and consent management mechanisms.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🗄️</div><div class="domain-info"><span class="domain-pillar-tag pt2">Pillar 2</span><div class="domain-name">Data Residency &amp; Storage</div><div class="domain-desc-card">Data inventory completeness, percentage of data stored nationally, technical and contractual residency controls, classification schemes, and DR/backup sovereignty.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🖥️</div><div class="domain-info"><span class="domain-pillar-tag pt2">Pillar 2</span><div class="domain-name">Infrastructure Control</div><div class="domain-desc-card">National ownership of critical IT assets, infrastructure sovereignty strategy, technology stack visibility, supply chain security, and operational independence from foreign vendors.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">☁️</div><div class="domain-info"><span class="domain-pillar-tag pt2">Pillar 2</span><div class="domain-name">Cloud &amp; Infrastructure Sovereignty</div><div class="domain-desc-card">Sovereign cloud strategy, workload placement, contract sovereignty provisions, exit strategy maturity, jurisdictional compliance, and log retention governance.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🔑</div><div class="domain-info"><span class="domain-pillar-tag pt2">Pillar 2</span><div class="domain-name">Encryption &amp; Key Sovereignty</div><div class="domain-desc-card">Key ownership and national control, key management policy, HSM deployment, approved cryptographic standards, and key lifecycle governance including rotation and emergency recovery.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🏗️</div><div class="domain-info"><span class="domain-pillar-tag pt3">Pillar 3</span><div class="domain-name">Critical Infrastructure Protection</div><div class="domain-desc-card">CNI register completeness, CIP programme maturity, cyber-physical dependency mapping, CSIRT/SOC capability, IR plan testing, and foreign investment screening.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🔗</div><div class="domain-info"><span class="domain-pillar-tag pt3">Pillar 3</span><div class="domain-name">Vendor &amp; Supply Chain Management</div><div class="domain-desc-card">Vendor risk assessment processes, sovereignty contract clauses, prohibited vendor lists, concentration risk management, supply chain verification, and MSP requirements.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🌐</div><div class="domain-info"><span class="domain-pillar-tag pt4">Pillar 4</span><div class="domain-name">Cross-Border Data Flow Governance</div><div class="domain-desc-card">Transfer policies and enforcement, Transfer Impact Assessments, SCCs and equivalent mechanisms, transfer registers, technical flow controls, and international framework engagement.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🔍</div><div class="domain-info"><span class="domain-pillar-tag pt4">Pillar 4</span><div class="domain-name">Vendor Access Audit</div><div class="domain-desc-card">Comprehensive vendor access logging, access recertification schedules, JIT privileged access controls, jurisdictional access restrictions, supervisory requirements, and immutable audit trails.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🪪</div><div class="domain-info"><span class="domain-pillar-tag pt5">Pillar 5</span><div class="domain-name">Identity &amp; Access Management</div><div class="domain-desc-card">Enterprise IAM framework, universal MFA enforcement, PAM deployment, automated provisioning/deprovisioning, zero-trust architecture, national PKI adoption, and least-privilege reviews.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🤖</div><div class="domain-info"><span class="domain-pillar-tag pt5">Pillar 5</span><div class="domain-name">AI Governance &amp; Sovereignty</div><div class="domain-desc-card">AI system inventory, governance framework enforcement, training data provenance and residency, AI sovereignty risk assessment, human oversight requirements, national AI strategy, and data exfiltration controls.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">⚙️</div><div class="domain-info"><span class="domain-pillar-tag pt5">Pillar 5</span><div class="domain-name">Operational Sovereignty</div><div class="domain-desc-card">Crisis operational resilience, digital skills strategy, vendor-independent operating procedures, sovereign BCP scenarios, national cyber defence capability, and expertise retention programmes.</div></div></div>
+    <div class="domain-card"><div class="domain-icon">🏛️</div><div class="domain-info"><span class="domain-pillar-tag pt5">Pillar 5</span><div class="domain-name">Institutional Capacity &amp; Oversight</div><div class="domain-desc-card">Board-level sovereignty leadership, executive briefing cadence, ring-fenced sovereignty budget, approved sovereignty strategy, KPI accountability frameworks, governance body participation, and threat escalation processes.</div></div></div>
+  </div>
+</section>
+
+<hr class="section-divider page-break">
+
+<!-- ── SECTION 6: SCORING METHODOLOGY & MATURITY MODEL ───── -->
+<section class="wp-section" id="scoring">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 06</div>
+    <h2 class="section-title">Scoring Methodology &amp; Maturity Model</h2>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">6.1 &nbsp;Question Design</h3>
+    <p>DDSAT comprises <strong>84 questions</strong> distributed across the 14 domains. Each question presents four response options arranged on an ascending maturity scale. The four levels — <em>Critical</em> (scored 0), <em>Developing</em> (scored 1), <em>Managed</em> (scored 2), and <em>Optimizing</em> (scored 3) — are carefully calibrated to reflect meaningfully distinct capability states. Response options are phrased as concrete, observable characteristics rather than abstract aspirations, enabling assessors to select the option that most accurately describes current organisational practice rather than intended future state.</p>
+    <p>Questions are structured to distinguish between the existence of a policy and its effective implementation; between documentation and active enforcement; between capability and tested, demonstrated practice. This design prevents organisations from over-claiming maturity on the basis of written policies that have not been operationalised — a common failure mode in maturity assessments that use broader, more subjective response scales.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">6.2 &nbsp;Domain Scoring</h3>
+    <p>Each domain score is calculated as the sum of all question scores within that domain, expressed as a percentage of the maximum possible score for that domain. Where a domain contains questions of varying strategic importance, responses are averaged to produce a domain percentage score on a 0–100 scale.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">6.3 &nbsp;Pillar Scoring</h3>
+    <p>Each pillar score is the simple arithmetic mean of the domain scores within that pillar, also expressed on a 0–100 scale. This approach ensures that all domains within a pillar contribute equally to the pillar score, preventing a single high-scoring domain from masking critical gaps in adjacent domains.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">6.4 &nbsp;Digital Sovereignty Index (DSI)</h3>
+    <p>The DSI is the weighted composite of all five pillar scores, with weights reflecting each pillar's relative strategic importance to overall sovereignty. The weights are fixed at: P1 Legal &amp; Regulatory = 20%; P2 Data Localization &amp; Infrastructure = 25%; P3 Critical Infrastructure = 20%; P4 Cross-Border Governance = 15%; P5 Institutional Capacity = 20%.</p>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula-label">Scoring Formulae</div>
+    <div class="formula-line"><strong>Domain Score</strong> &nbsp;= &nbsp;( Σ Question Scores ) ÷ ( n × 3 ) &nbsp;× &nbsp;100</div>
+    <div class="formula-line"><strong>Pillar Score</strong> &nbsp;= &nbsp;( Σ Domain Scores within Pillar ) ÷ ( Number of Domains in Pillar )</div>
+    <div class="formula-line"><strong>DSI</strong> &nbsp;= &nbsp;( P1 × 0.20 ) + ( P2 × 0.25 ) + ( P3 × 0.20 ) + ( P4 × 0.15 ) + ( P5 × 0.20 )</div>
+    <div class="formula-note">Where n = number of questions in the domain; each question scored 0 (Critical), 1 (Developing), 2 (Managed), or 3 (Optimizing). All scores expressed on a 0–100 scale.</div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">6.5 &nbsp;Five Maturity Levels</h3>
+    <p>DDSAT maps DSI and domain scores to five maturity levels, each with a distinct organisational profile and remediation posture. The maturity scale is designed to provide meaningful differentiation at all score ranges, avoiding the compression of real capability differences that characterises binary pass/fail assessments.</p>
+  </div>
+
+  <div class="maturity-container">
+    <div class="maturity-bar">
+      <div class="mat-seg mat-initial">Initial</div>
+      <div class="mat-seg mat-developing">Developing</div>
+      <div class="mat-seg mat-defined">Defined</div>
+      <div class="mat-seg mat-managed">Managed</div>
+      <div class="mat-seg mat-optimizing">Optimizing</div>
+    </div>
+    <div class="maturity-labels">
+      <div class="mat-label">0 – 19%</div>
+      <div class="mat-label">20 – 39%</div>
+      <div class="mat-label">40 – 59%</div>
+      <div class="mat-label">60 – 79%</div>
+      <div class="mat-label">80 – 100%</div>
+    </div>
+    <div class="maturity-levels">
+      <div class="mat-level-card ml-initial"><div class="mat-level-name">Initial / Ad-hoc</div><div class="mat-level-range r-initial">0–19%</div><div class="mat-level-desc">Sovereignty controls are absent or entirely reactive. No formal policies, strategies, or accountabilities in place. Immediate executive attention required.</div></div>
+      <div class="mat-level-card ml-developing"><div class="mat-level-name">Developing</div><div class="mat-level-range r-developing">20–39%</div><div class="mat-level-desc">Some controls and policies are being established, but coverage is fragmented, inconsistently applied, and lacks enforcement mechanisms or executive ownership.</div></div>
+      <div class="mat-level-card ml-defined"><div class="mat-level-name">Defined</div><div class="mat-level-range r-defined">40–59%</div><div class="mat-level-desc">A coherent sovereignty framework exists and is documented. Controls are applied with reasonable consistency, but testing, monitoring, and continuous improvement are limited.</div></div>
+      <div class="mat-level-card ml-managed"><div class="mat-level-name">Managed</div><div class="mat-level-range r-managed">60–79%</div><div class="mat-level-desc">Sovereignty controls are actively monitored, measured, and improved. Most domains demonstrate strong capability with limited, identified gaps. KPIs are tracked at executive level.</div></div>
+      <div class="mat-level-card ml-optimizing"><div class="mat-level-name">Optimizing</div><div class="mat-level-range r-optimizing">80–100%</div><div class="mat-level-desc">Sovereignty is institutionalised as an organisational discipline. Controls are continuously improved, regularly exercised, and proactively adapted to emerging threats and technologies.</div></div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider page-break">
+
+<!-- ── SECTION 7: KEY PERFORMANCE INDICATORS ─────────────── -->
+<section class="wp-section" id="kpis">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 07</div>
+    <h2 class="section-title">Key Performance Indicators (KPIs)</h2>
+  </div>
+
+  <p>A central objective of DDSAT is to translate the nuanced findings of a comprehensive maturity assessment into a set of discrete, quantifiable Key Performance Indicators suitable for executive reporting, cross-agency benchmarking, and longitudinal progress tracking. KPIs bridge the gap between the operational detail of individual assessment domains and the strategic visibility that ministers, board members, and senior officials require to make informed investment and policy decisions.</p>
+  <p>Each of DDSAT's 12 KPIs is derived directly from domain scores, ensuring full traceability between executive-level metrics and the underlying assessment evidence. KPIs are colour-coded using a traffic-light threshold system: <span class="threshold-g">Green ≥ 80%</span> indicates a managed-to-optimizing posture; <span class="threshold-a">Amber 40–79%</span> indicates a defined-to-developing posture requiring planned investment; and <span class="threshold-r">Red &lt; 40%</span> indicates a critical gap requiring urgent remediation.</p>
+  <p>The <strong>Vendor Dependency Risk Index</strong> is intentionally inverted: a higher score indicates greater sovereign risk (more dependency), rather than greater maturity. This ensures that executive audiences receive an unambiguous risk signal in the domain where complacency is most prevalent.</p>
+
+  <table class="kpi-table">
+    <thead><tr><th>#</th><th>KPI Name</th><th>Derivation</th><th>Strategic Purpose</th><th>Threshold</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td><span class="kpi-name">Digital Sovereignty Index (DSI)</span><span class="kpi-formula">Weighted composite of P1–P5 pillar scores</span></td><td>All 5 pillars</td><td>Single sovereign posture metric for board reporting and inter-agency benchmarking</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+      <tr><td>2</td><td><span class="kpi-name">Legal &amp; Regulatory Alignment Score</span><span class="kpi-formula">Avg(legal, dataprotect)</span></td><td>Pillar 1</td><td>Legislative foundation adequacy; DPA capacity; enforcement effectiveness</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+      <tr><td>3</td><td><span class="kpi-name">Data Residency Compliance Rate</span><span class="kpi-formula">Avg(residency, cloud)</span></td><td>P2 Domains</td><td>Percentage of data flows under national jurisdictional control; cloud sovereignty posture</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+      <tr><td>4</td><td><span class="kpi-name">Infrastructure Control Score</span><span class="kpi-formula">Avg(infra, cloud)</span></td><td>P2 Domains</td><td>National ownership and operational control of critical IT infrastructure assets</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+      <tr><td>5</td><td><span class="kpi-name">Encryption Sovereignty Score</span><span class="kpi-formula">Domain: encrypt</span></td><td>P2 Domain</td><td>National control of cryptographic keys; HSM deployment; standards compliance</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+      <tr><td>6</td><td><span class="kpi-name">AI Governance Index</span><span class="kpi-formula">Domain: aiGov</span></td><td>P5 Domain</td><td>AI inventory completeness; governance framework; training data provenance; oversight</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+      <tr><td>7</td><td><span class="kpi-name">Vendor Dependency Risk Index ⚠</span><span class="kpi-formula">100 – Avg(vendor, vendoraudit)</span></td><td>P3 &amp; P4</td><td>Inverted score: measures sovereign risk from vendor dependency; higher = greater risk</td><td><span class="threshold-r">≥60</span> <span class="threshold-a">20–59</span> <span class="threshold-g">&lt;20</span></td></tr>
+      <tr><td>8</td><td><span class="kpi-name">Cross-Border Governance Rate</span><span class="kpi-formula">Domain: crossborder</span></td><td>Pillar 4</td><td>Coverage of international data transfers by approved mechanisms and impact assessments</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+      <tr><td>9</td><td><span class="kpi-name">Critical Infrastructure Resilience Score</span><span class="kpi-formula">Domain: critinfra</span></td><td>Pillar 3</td><td>CNI register completeness; CIP programme maturity; CSIRT capability; IR plan quality</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+      <tr><td>10</td><td><span class="kpi-name">IAM Maturity Score</span><span class="kpi-formula">Domain: iam</span></td><td>P5 Domain</td><td>Identity governance strength; MFA and PAM coverage; zero-trust adoption; PKI maturity</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+      <tr><td>11</td><td><span class="kpi-name">Operational Resilience Index</span><span class="kpi-formula">Domain: ops</span></td><td>P5 Domain</td><td>Crisis operational capability; skills sovereignty; vendor-independent procedures; BCP</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+      <tr><td>12</td><td><span class="kpi-name">Executive Oversight Index</span><span class="kpi-formula">Domain: institutional</span></td><td>P5 Domain</td><td>Board-level accountability; sovereignty budget; strategy approval; KPI governance</td><td><span class="threshold-g">≥80</span> <span class="threshold-a">40–79</span> <span class="threshold-r">&lt;40</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<hr class="section-divider page-break">
+
+<!-- ── SECTION 8: STRATEGIC OUTCOMES ─────────────────────── -->
+<section class="wp-section" id="outcomes">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 08</div>
+    <h2 class="section-title">Strategic Outcomes</h2>
+  </div>
+
+  <p>DDSAT is designed to strengthen three interdependent strategic outcomes that together constitute the practical meaning of digital sovereignty for governments and critical infrastructure operators. These outcomes are not siloed — progress in each reinforces and enables progress in the others.</p>
+
+  <div class="outcome-cards">
+    <div class="outcome-card oc-citizen"><div class="oc-icon">👥</div><div class="oc-title">Protecting Citizen Data</div><div class="oc-desc">Ensuring personal data is held lawfully, stored nationally, protected from foreign access, and governed transparently — maintaining the digital trust covenant between citizens and the state.</div></div>
+    <div class="outcome-card oc-infra"><div class="oc-icon">🏗️</div><div class="oc-title">Governing Digital Infrastructure</div><div class="oc-desc">Ensuring the systems on which public services depend remain under national authority, operationally independent, and protected from supply chain compromise or foreign control.</div></div>
+    <div class="outcome-card oc-continuity"><div class="oc-icon">⚡</div><div class="oc-title">Ensuring Service Continuity</div><div class="oc-desc">Guaranteeing that essential services for citizens remain available through crises, cyberattacks, geopolitical disruption, and the failure or withdrawal of foreign technology providers.</div></div>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">8.1 &nbsp;Protecting Citizen Data</h3>
+    <p>The protection of citizen data is the most fundamental obligation of the digital state. When citizens interact with government — registering for benefits, filing tax returns, accessing health services, enrolling children in schools — they surrender personal data under an implicit covenant of stewardship. That covenant requires not merely that the data be secured against unauthorised access, but that it be governed in accordance with the citizen's rights, stored within jurisdictions where those rights are enforceable, and protected from access by foreign governments or commercial entities whose interests may not align with those of the citizen or the state.</p>
+    <p>DDSAT's legal and regulatory alignment pillar directly assesses the legislative and institutional foundations of this obligation: whether data protection law is in place and enforced; whether a genuinely independent supervisory authority exists with the capacity and mandate to hold government departments to account; whether data protection impact assessments are conducted before high-risk processing begins; and whether citizens are given meaningful control over the use of their data through effective consent management mechanisms.</p>
+    <p>The data residency domain quantifies the practical effectiveness of these legal protections: a government with strong data protection law but a majority of citizen data processed on foreign-jurisdictioned cloud platforms has a legal framework that cannot in practice be enforced against the entities that hold the most sensitive data. DDSAT's cross-border governance domain ensures that transfer mechanisms are in place wherever citizen data does cross borders, and that impact assessments have evaluated whether the destination jurisdiction offers equivalent protection.</p>
+    <p>The AI governance domain adds a dimension that conventional data protection frameworks were not designed to address: the risk that citizen data is used, without adequate transparency or control, to train foreign AI models — or that AI systems making consequential decisions about citizens operate without the explainability and oversight that citizens have a right to expect. DDSAT's 84-question evaluation ensures these risks are surfaced and quantified alongside conventional data protection concerns.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">8.2 &nbsp;Governing Digital Infrastructure</h3>
+    <p>A government that does not control the infrastructure on which its services run cannot be said to be fully sovereign. Infrastructure sovereignty is not merely a technical concern — it is a strategic and constitutional one. The ability to make binding decisions about one's own systems, to enforce those decisions against the entities that operate the infrastructure, and to act decisively in a crisis without requiring permission or cooperation from foreign vendors is a precondition for genuine self-governance in the digital age.</p>
+    <p>DDSAT's infrastructure control domain quantifies the extent of national ownership and operational independence, benchmarked against a pragmatic framework that recognises that complete national ownership of all IT infrastructure is neither achievable nor necessary. What is necessary is that the minimum sovereign capability — the ability to maintain critical systems without foreign vendor cooperation in a crisis — is demonstrably present and regularly tested. The cloud sovereignty domain assesses whether cloud strategies preserve this capability by ensuring that exit provisions exist, that logging and monitoring data is retained nationally, and that all contracts have been reviewed for sovereignty provisions by appropriately qualified legal and security professionals.</p>
+    <p>The encryption and key sovereignty domain is of particular strategic importance. End-to-end encryption protects data only if the encryption keys are under national control. A government that stores sensitive data in encrypted form on a national cloud platform but holds its encryption keys in a third-party key management service subject to foreign jurisdiction has sovereignty of form but not of substance. DDSAT evaluates key management at the level of HSM deployment, key storage jurisdiction, cryptographic standards, and the availability of tested emergency recovery procedures — ensuring that encryption sovereignty is assessed with the rigour it demands.</p>
+    <p>The vendor and supply chain management domain addresses the systemic risks introduced by the complex, globally distributed nature of modern technology supply chains. DDSAT assesses whether formal prohibited vendor lists exist and are enforced; whether supply chain security verification — including software bill of materials analysis and hardware provenance review — is conducted for critical components; and whether managed service providers are subject to the enhanced sovereignty requirements that their privileged access to government systems demands.</p>
+  </div>
+
+  <div class="subsection">
+    <h3 class="subsection-title">8.3 &nbsp;Ensuring Continuity of Service Delivery</h3>
+    <p>The ultimate test of digital sovereignty is not how well an organisation performs under normal conditions, but how it performs when those conditions fail. Cyberattacks against critical national infrastructure have increased dramatically in frequency and sophistication. Geopolitical tensions have demonstrated that technology supply chains can become instruments of economic coercion. The sudden withdrawal of a major cloud provider, the imposition of export controls on critical software components, or the disruption of global semiconductor supply chains can render government digital services inoperable within hours.</p>
+    <p>DDSAT's operational sovereignty domain assesses the most concrete and demanding test of sovereign capability: can the organisation actually maintain critical services without external dependencies in a sustained crisis? This requires not merely the existence of business continuity plans, but their explicit design around sovereign risk scenarios — the loss of foreign cloud access, the withdrawal of a key managed service provider, the imposition of sanctions that prevent licence renewal — and their regular testing through exercises that genuinely stress these scenarios rather than assume the continued availability of normal infrastructure.</p>
+    <p>The critical infrastructure protection domain complements this assessment by evaluating the maturity of the organisation's protective and responsive capabilities: the completeness of CNI identification, the resourcing of protective programmes, the 24/7 availability of a CSIRT or SOC with specific CNI responsibilities, and the quality of tested incident response and recovery plans. Nations with mature CIP programmes backed by adequate legal frameworks for foreign investment screening have demonstrably greater resilience to the systemic shocks — whether technical, economic, or geopolitical — that most threaten service continuity.</p>
+    <p>The institutional capacity and oversight domain provides the organisational foundation for sustained resilience: sovereignty cannot be maintained without the sustained investment, executive attention, and institutional accountability that only board-level ownership and ring-fenced budgets can provide. DDSAT's assessment of these dimensions ensures that service continuity is evaluated not as a technical capability alone, but as the organisational commitment to maintain that capability over time in the face of competing priorities and resource pressures.</p>
+  </div>
+</section>
+
+<hr class="section-divider page-break">
+
+<!-- ── SECTION 9: IMPLEMENTATION ROADMAP ─────────────────── -->
+<section class="wp-section" id="roadmap">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 09</div>
+    <h2 class="section-title">Implementation Roadmap</h2>
+  </div>
+  <p>DDSAT is designed to be conducted within an eight-week assessment cycle, producing a complete DSI, domain scorecard, KPI dashboard, and prioritised remediation roadmap. The assessment follows four structured phases, with an ongoing cycle of improvement and annual reassessment thereafter.</p>
+
+  <div class="roadmap">
+    <div class="roadmap-line"></div>
+    <div class="roadmap-phase">
+      <div class="phase-dot pd-1">1</div>
+      <div class="phase-content">
+        <div class="phase-timing">Phase 1 &nbsp;·&nbsp; Weeks 1–2</div>
+        <div class="phase-title">Scope &amp; Mobilise</div>
+        <ul class="phase-items">
+          <li>Define the assessment boundary and any in-scope exclusions (e.g., classified systems)</li>
+          <li>Assemble the assessment team: lead assessor, domain subject matter experts, legal counsel, and CISO</li>
+          <li>Secure executive sponsorship and formal mandate from the relevant accountable executive</li>
+          <li>Brief key stakeholders and establish evidence collection channels</li>
+          <li>Agree assessment calendar, review milestones, and governance arrangements</li>
+        </ul>
+      </div>
+    </div>
+    <div class="roadmap-phase">
+      <div class="phase-dot pd-2">2</div>
+      <div class="phase-content">
+        <div class="phase-timing">Phase 2 &nbsp;·&nbsp; Weeks 3–6</div>
+        <div class="phase-title">Conduct Assessment</div>
+        <ul class="phase-items">
+          <li>Complete all 84 DDSAT questions across 14 domains with relevant SMEs providing domain-specific input</li>
+          <li>Gather documentary evidence for each response: policies, audit reports, contracts, test records</li>
+          <li>Validate responses through triangulation of multiple evidence sources where available</li>
+          <li>Flag contested responses for senior review and document rationale for scoring decisions</li>
+          <li>Conduct structured interviews with domain owners to test understanding behind documented policies</li>
+        </ul>
+      </div>
+    </div>
+    <div class="roadmap-phase">
+      <div class="phase-dot pd-3">3</div>
+      <div class="phase-content">
+        <div class="phase-timing">Phase 3 &nbsp;·&nbsp; Weeks 7–8</div>
+        <div class="phase-title">Analyse &amp; Report</div>
+        <ul class="phase-items">
+          <li>Generate DSI, domain scores, pillar scores, and all 12 KPIs from assessment responses</li>
+          <li>Produce radar charts, domain scorecards, and maturity level assessments for executive reporting</li>
+          <li>Rank remediation recommendations by severity, strategic impact, and implementation effort</li>
+          <li>Prepare executive summary, detailed findings report, and board-level KPI dashboard</li>
+          <li>Present findings to the accountable executive and agree priority actions and ownership</li>
+        </ul>
+      </div>
+    </div>
+    <div class="roadmap-phase">
+      <div class="phase-dot pd-4">↻</div>
+      <div class="phase-content">
+        <div class="phase-timing">Phase 4 &nbsp;·&nbsp; Ongoing</div>
+        <div class="phase-title">Remediate &amp; Reassess</div>
+        <ul class="phase-items">
+          <li>Implement remediation roadmap with domain owners accountable for specific KPI improvements</li>
+          <li>Track KPI trends quarterly through the executive oversight and accountability framework</li>
+          <li>Conduct interim domain-level reviews where significant changes occur (major procurements, incidents, legislative changes)</li>
+          <li>Repeat the full DDSAT assessment annually to generate trend data, track maturity progression, and refresh the remediation roadmap</li>
+          <li>Consider peer benchmarking with equivalent organisations to contextualise scores and share best practice</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-blue" style="margin-top:20px">
+    <div class="callout-label">Implementation Guidance</div>
+    <div class="callout-title">Key Success Factors</div>
+    <p style="font-size:13px;color:var(--gray-700);margin-bottom:0">DDSAT assessments are most valuable when conducted with genuine senior executive sponsorship, when SMEs provide honest rather than aspirational responses, and when the resulting findings are connected to binding remediation commitments with named owners and deadlines. The assessment itself has limited value without a disciplined follow-through process. Organisations are encouraged to appoint a dedicated Digital Sovereignty Lead responsible for maintaining the KPI dashboard, coordinating remediation activities, and preparing the annual reassessment — ensuring that DDSAT becomes an embedded governance discipline rather than a one-time exercise.</p>
+  </div>
+</section>
+
+<hr class="section-divider page-break">
+
+<!-- ── SECTION 10: CONCLUSION ─────────────────────────────── -->
+<section class="wp-section" id="conclusion">
+  <div class="section-header">
+    <div class="section-eyebrow">Section 10</div>
+    <h2 class="section-title">Conclusion</h2>
+  </div>
+
+  <p>Digital sovereignty is not a technical preference — it is a fundamental attribute of statehood in the twenty-first century. The capacity to protect citizen data, govern digital infrastructure, and ensure the continuity of public services in the face of technological, geopolitical, and adversarial disruption is inseparable from the broader capacity of a government to honour its obligations to those it serves. Yet for too many governments, the precise nature of their sovereign digital posture remains unmeasured, unarticulated, and therefore unmanaged.</p>
+
+  <p>DDSAT changes this. By providing a rigorous, structured, and quantifiable methodology for assessing sovereignty across 14 domains and five strategic pillars, it enables governments and critical infrastructure operators to move from intuition to evidence, from aspiration to accountability, and from reactive crisis management to proactive sovereign governance. The Digital Sovereignty Index and its accompanying KPIs provide the executive language and the management metrics needed to sustain sovereignty as a strategic priority across budget cycles, political transitions, and the relentless pace of technological change.</p>
+
+  <p>No assessment can substitute for sustained political will, adequate resourcing, and the organisational commitment to act on findings. But it can provide the foundation — the baseline, the benchmark, the common framework — without which improvement cannot be systematically measured or sustained. Governments that begin this journey today will be better positioned to protect their citizens, defend their infrastructure, and maintain essential services when the sovereign tests of the coming decade arrive. Those that delay will find the task progressively harder and the gaps progressively wider.</p>
+
+  <p>The first step is to know where you stand. DDSAT is designed to tell you.</p>
+
+  <div class="callout callout-navy" style="margin-top:28px">
+    <div class="callout-label">Call to Action</div>
+    <div class="callout-title">Begin Your Sovereignty Assessment</div>
+    <p style="font-size:13px;color:rgba(255,255,255,.8);margin-bottom:0">DDSAT is available as an interactive digital tool, deployable within your organisation's secure environment. The assessment can be completed in 25–35 minutes and immediately generates a full Digital Sovereignty Index, 12 KPI cards, radar and domain charts, and a prioritised remediation roadmap. Contact your designated sovereignty lead or visit the DDSAT platform to begin your assessment today.</p>
+  </div>
+</section>
+
+<hr class="section-divider page-break">
+
+<!-- ── GLOSSARY ────────────────────────────────────────────── -->
+<section class="wp-section" id="glossary">
+  <div class="section-header">
+    <div class="section-eyebrow">Glossary</div>
+    <h2 class="section-title">Key Terms &amp; Definitions</h2>
+  </div>
+
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="glossary-term">Digital Sovereignty</div><div class="glossary-def">The capacity of a state or organisation to exercise autonomous authority over its digital assets, data flows, and technology infrastructure free from undue external control or extraterritorial legal exposure.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Data Residency</div><div class="glossary-def">The physical or geographic location in which data is stored and processed. Data residency requirements mandate that certain categories of data remain within specified national boundaries.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Data Localisation</div><div class="glossary-def">Legal or policy requirements mandating that data be collected, processed, and/or stored within a specific jurisdiction, preventing transfer to or processing in other countries.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Critical National Infrastructure (CNI)</div><div class="glossary-def">The assets, systems, and networks whose incapacitation or destruction would have a debilitating effect on national security, economic security, public health, or public safety.</div></div>
+    <div class="glossary-item"><div class="glossary-term">CSIRT</div><div class="glossary-def">Computer Security Incident Response Team. A specialist team responsible for receiving, reviewing, and responding to cybersecurity incident reports and activity within a defined constituency.</div></div>
+    <div class="glossary-item"><div class="glossary-term">SOC</div><div class="glossary-def">Security Operations Centre. A facility housing a team of security analysts who monitor, detect, analyse, and respond to cybersecurity incidents, typically on a 24/7 basis.</div></div>
+    <div class="glossary-item"><div class="glossary-term">HSM</div><div class="glossary-def">Hardware Security Module. A physical computing device that provides secure key generation, storage, and cryptographic operations, protecting cryptographic keys from disclosure or misuse.</div></div>
+    <div class="glossary-item"><div class="glossary-term">PKI</div><div class="glossary-def">Public Key Infrastructure. A framework of policies, procedures, hardware, software, and people used to create, manage, distribute, use, store, and revoke digital certificates and manage public-key encryption.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Zero Trust</div><div class="glossary-def">A security model based on the principle "never trust, always verify" — requiring continuous verification of identity and device trustworthiness for every access request, regardless of network location.</div></div>
+    <div class="glossary-item"><div class="glossary-term">TIA (Transfer Impact Assessment)</div><div class="glossary-def">An assessment conducted before transferring personal data to a third country to evaluate whether the destination provides an essentially equivalent level of data protection to the originating jurisdiction.</div></div>
+    <div class="glossary-item"><div class="glossary-term">SCC (Standard Contractual Clauses)</div><div class="glossary-def">Pre-approved contractual terms issued by a data protection authority (notably the European Commission) that provide an approved legal mechanism for transferring personal data to third countries.</div></div>
+    <div class="glossary-item"><div class="glossary-term">BCR (Binding Corporate Rules)</div><div class="glossary-def">Internal data protection policies used by multinational corporations to transfer personal data internationally within a corporate group, approved by the relevant supervisory authority as providing adequate protection.</div></div>
+    <div class="glossary-item"><div class="glossary-term">DPIA (Data Protection Impact Assessment)</div><div class="glossary-def">A process designed to describe processing activities, assess their necessity and proportionality, and help manage the risks to individuals arising from the processing of their personal data.</div></div>
+    <div class="glossary-item"><div class="glossary-term">PAM (Privileged Access Management)</div><div class="glossary-def">A cybersecurity strategy and technology for controlling, monitoring, securing, and auditing all privileged identities and activities across an organisation's IT environment.</div></div>
+    <div class="glossary-item"><div class="glossary-term">DSI (Digital Sovereignty Index)</div><div class="glossary-def">The aggregate, weighted composite score generated by DDSAT, expressed on a 0–100 scale, representing an organisation's overall digital sovereignty posture across all five pillars and 14 domains.</div></div>
+  </div>
+</section>
+
+<!-- DOC FOOTER -->
+<div class="doc-footer">
+  <strong>DDSAT White Paper v1.0</strong> &nbsp;·&nbsp; Digital &amp; Data Sovereignty Assessment Tool &nbsp;·&nbsp; Classification: PUBLIC &nbsp;·&nbsp; April 2026
+</div>
+
+</div><!-- /wp-wrap -->
+</body>
+</html>
