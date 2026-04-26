@@ -1,0 +1,28 @@
+
+● DDSAT_Landing.html is ready at C:\Users\Gallo\DDSAT_Landing.html.
+
+  ---
+  To deploy on talismancybersecurity.com:
+
+  Step 1 — Upload all 5 files to GoDaddy File Manager:
+  public_html/ddsat/DDSAT_Landing.html
+  public_html/ddsat/DDSAT_DEMO.html
+  public_html/ddsat/DDSAT.html
+  public_html/ddsat/DDSAT_FR.html
+  public_html/ddsat/DDSAT_WhitePaper.html
+
+  Step 2 — In WordPress, create a new Page:
+  - Title: DDSAT — Digital Sovereignty Assessment Tool
+  - Add a Custom HTML block
+  - Paste:
+  <iframe src="/ddsat/DDSAT_Landing.html" width="100%" height="4000px" style="border:none; display:block;"></iframe>
+
+  Or (cleaner option): Set the WordPress page to use a full-width template and use a redirect to
+  /ddsat/DDSAT_Landing.html directly.
+
+  Step 3 — Add to navigation:
+  WordPress Admin → Appearance → Menus → Add the page under Services
+
+  ---
+  The landing page matches Talisman's dark cybersecurity aesthetic with navy/cyan colors, grid background, and links to
+  all four tools with the /contact page for expert engagemen
